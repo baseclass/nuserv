@@ -307,8 +307,10 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\Lucene\Users\" />
-    <Folder Include="App_Data\Packages\" />
+    <Folder Include="App_Data\repo1\Lucene\Users\" />
+    <Folder Include="App_Data\repo1\Packages\" />
+    <Folder Include="App_Data\repo2\Lucene\Users\" />
+    <Folder Include="App_Data\repo2\Packages\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

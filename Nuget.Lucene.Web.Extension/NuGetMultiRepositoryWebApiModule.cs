@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Hosting;
 using Lucene.Net.Linq;
 using Lucene.Net.Store;
@@ -23,7 +24,7 @@ namespace Nuget.Lucene.Web.Extension
    public class NuGetMultiRepositoryWebApiModule : NinjectModule
     {
         public const string AppSettingNamesapce = "NuGet.Lucene.Web:";
-        public const string DefaultRoutePathPrefix = "api/";
+        public const string DefaultRoutePathPrefix = "repository/{repository}/api/";
 
         public override void Load()
         {
@@ -31,35 +32,68 @@ namespace Nuget.Lucene.Web.Extension
                 {
                     EnablePackageFileWatcher = GetFlagFromAppSetting("enablePackageFileWatcher", true),
                     GroupPackageFilesById = GetFlagFromAppSetting("groupPackageFilesById", true),
-                    LuceneIndexPath = MapPathFromAppSetting("lucenePath", "~/App_Data/Lucene"),
-                    PackagePath = MapPathFromAppSetting("packagesPath", "~/App_Data/Packages")
+                    LuceneIndexPath = MapPathFromAppSetting("lucenePath", "~/App_Data/repo1/Lucene"),
+                    PackagePath = MapPathFromAppSetting("packagesPath", "~/App_Data/repo1/Packages")
                 };
 
+            var cfg2 = new LuceneRepositoryConfigurator
+            {
+                EnablePackageFileWatcher = GetFlagFromAppSetting("enablePackageFileWatcher", true),
+                GroupPackageFilesById = GetFlagFromAppSetting("groupPackageFilesById", true),
+                LuceneIndexPath = MapPathFromAppSetting("lucenePath", "~/App_Data/repo2/Lucene"),
+                PackagePath = MapPathFromAppSetting("packagesPath", "~/App_Data/repo2/Packages")
+            };
+
             cfg.Initialize();
+
+            cfg2.Initialize();
 
             Kernel.Components.Add<IInjectionHeuristic, NonDecoratedPropertyInjectionHeuristic>();
 
             var routeMapper = new NuGetWebApiRouteMapper(RoutePathPrefix);
             var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
-            var usersDataProvider = InitializeUsersDataProvider();
+            var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(cfg2.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
+            var usersDataProvider = InitializeUsersDataProvider(cfg.LuceneIndexPath);
+            var usersDataProvider2 = InitializeUsersDataProvider(cfg2.LuceneIndexPath);
 
             Bind<NuGetWebApiRouteMapper>().ToConstant(routeMapper);
-            Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).OnDeactivation(_ => cfg.Dispose());
-            Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository);
-            Bind<LuceneDataProvider>().ToConstant(cfg.Provider);
-            Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));
+
+            Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).When(req => IsRepo("repo1")).OnDeactivation(_ => cfg.Dispose());
+            Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository).When(req => IsRepo("repo1"));
+            Bind<LuceneDataProvider>().ToConstant(cfg.Provider).When(req => IsRepo("repo1"));
+            Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));//.When(req => IsRepo("repo1"));
+
+            Bind<ILucenePackageRepository>().ToConstant(cfg2.Repository).When(req => IsRepo("repo2")).OnDeactivation(_ => cfg.Dispose());
+            Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository2).When(req => IsRepo("repo2"));
+            Bind<LuceneDataProvider>().ToConstant(cfg2.Provider).When(req => IsRepo("repo2"));
+            //Bind<UserStore>().ToConstant(new UserStore(usersDataProvider2)).When(req => IsRepo("repo2"));
             
             LoadAuthentication();
 
             var tokenSource = new ReusableCancellationTokenSource();
             Bind<ReusableCancellationTokenSource>().ToConstant(tokenSource);
 
-            var repository = base.Kernel.Get<ILucenePackageRepository>();
-
             if (GetFlagFromAppSetting("synchronizeOnStart", true))
             {
-                repository.SynchronizeWithFileSystem(tokenSource.Token);    
+                cfg.Repository.SynchronizeWithFileSystem(tokenSource.Token);
+                cfg2.Repository.SynchronizeWithFileSystem(tokenSource.Token);  
             }
+        }
+
+        private static bool IsRepo(string repository)
+        {
+            var mvcHandler = (MvcHandler)HttpContext.Current.Handler;
+
+            var routeValues = mvcHandler.RequestContext.RouteData.Values;
+
+            var containsKey = routeValues.ContainsKey("repository");
+
+            if (!containsKey)
+            {
+                return false;
+            }
+
+            return (string)routeValues["repository"] == repository;
         }
 
         public virtual void LoadAuthentication()
@@ -79,9 +113,9 @@ namespace Nuget.Lucene.Web.Extension
             }
         }
 
-        public virtual LuceneDataProvider InitializeUsersDataProvider()
+        public virtual LuceneDataProvider InitializeUsersDataProvider(string path)
         {
-            var usersIndexPath = Path.Combine(MapPathFromAppSetting("lucenePath", "~/App_Data/Lucene"), "Users");
+            var usersIndexPath = Path.Combine(path, "Users");
             var directoryInfo = new DirectoryInfo(usersIndexPath);
             var dir = FSDirectory.Open(directoryInfo, new NativeFSLockFactory(directoryInfo));
             var provider = new LuceneDataProvider(dir, Version.LUCENE_30);

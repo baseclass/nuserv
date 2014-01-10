@@ -16,6 +16,10 @@ namespace nuserv.App_Start
     using AspNet.WebApi.HtmlMicrodataFormatter;
     using System.Web.Http.Description;
     using NuGet.Lucene.Web.Formatters;
+    using System.Web.Mvc;
+    using System.Reflection;
+    using Ninject.Web.WebApi;
+    using Nuget.Lucene.Web.Extension;
 
     public static class NinjectWebCommon 
     {
@@ -48,7 +52,7 @@ namespace nuserv.App_Start
             var kernel = new StandardKernel(new NuGetMultiRepositoryWebApiModule());
             kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
-            
+
             RegisterServices(kernel);
             return kernel;
         }
@@ -61,7 +65,9 @@ namespace nuserv.App_Start
         {
             var routeMapper = kernel.Get<NuGetWebApiRouteMapper>();
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
-            routeMapper.MapDataServiceRoutes(RouteTable.Routes);
+            
+            //Currently not working!
+            //routeMapper.MapDataServiceRoutes(RouteTable.Routes);
 
             var config = GlobalConfiguration.Configuration;
 
