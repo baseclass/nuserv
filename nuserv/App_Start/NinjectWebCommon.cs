@@ -10,6 +10,12 @@ namespace nuserv.App_Start
 
     using Ninject;
     using Ninject.Web.Common;
+    using NuGet.Lucene.Web;
+    using System.Web.Routing;
+    using System.Web.Http;
+    using AspNet.WebApi.HtmlMicrodataFormatter;
+    using System.Web.Http.Description;
+    using NuGet.Lucene.Web.Formatters;
 
     public static class NinjectWebCommon 
     {
@@ -39,7 +45,7 @@ namespace nuserv.App_Start
         /// <returns>The created kernel.</returns>
         private static IKernel CreateKernel()
         {
-            var kernel = new StandardKernel();
+            var kernel = new StandardKernel(new NuGetWebApiModule(), new SignalRModule());
             kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
             
@@ -53,6 +59,19 @@ namespace nuserv.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            var routeMapper = kernel.Get<NuGetWebApiRouteMapper>();
+            routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
+            routeMapper.MapDataServiceRoutes(RouteTable.Routes);
+
+            var config = GlobalConfiguration.Configuration;
+
+            // load xml documentation for assemblies
+            var documentation = new HtmlDocumentation();
+            documentation.Load();
+            config.Services.Replace(typeof(IDocumentationProvider), new WebApiHtmlDocumentationProvider(documentation));
+
+            // register the formatter
+            config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
         }        
     }
 }
