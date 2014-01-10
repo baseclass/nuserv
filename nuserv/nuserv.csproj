@@ -314,6 +314,12 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nuget.Lucene.Web.Extension\Nuget.Lucene.Web.Extension.csproj">
+      <Project>{22d1df93-4377-4578-a075-fb4b3a93afe4}</Project>
+      <Name>Nuget.Lucene.Web.Extension</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
