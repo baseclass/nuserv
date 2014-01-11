@@ -57,8 +57,7 @@ namespace NuGet.Lucene.Web.Extension
             var routeMapper = new NuGetMultiRepositoryWebApiRouteMapper(RoutePathPrefix, RepositoryPathPrefix);
             var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
             var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(cfg2.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
-            var usersDataProvider = InitializeUsersDataProvider(cfg.LuceneIndexPath);
-            var usersDataProvider2 = InitializeUsersDataProvider(cfg2.LuceneIndexPath);
+            var usersDataProvider = InitializeUsersDataProvider("~/App_Data/");
 
             Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
 
@@ -70,7 +69,6 @@ namespace NuGet.Lucene.Web.Extension
             Bind<ILucenePackageRepository>().ToConstant(cfg2.Repository).When(req => IsRepo("repo2")).OnDeactivation(_ => cfg.Dispose());
             Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository2).When(req => IsRepo("repo2"));
             Bind<LuceneDataProvider>().ToConstant(cfg2.Provider).When(req => IsRepo("repo2"));
-            //Bind<UserStore>().ToConstant(new UserStore(usersDataProvider2)).When(req => IsRepo("repo2"));
             
             LoadAuthentication();
 
