@@ -18,6 +18,9 @@ using NuGet.Lucene.Web.Authentication;
 using NuGet.Lucene.Web.Models;
 using NuGet.Lucene.Web.Modules;
 using Version = Lucene.Net.Util.Version;
+using System.Web.Http.WebHost;
+using System.Web.Http.WebHost.Routing;
+using System.Net.Http;
 
 namespace Nuget.Lucene.Web.Extension
 {
@@ -82,9 +85,12 @@ namespace Nuget.Lucene.Web.Extension
 
         private static bool IsRepo(string repository)
         {
-            var mvcHandler = (MvcHandler)HttpContext.Current.Handler;
+            var mvcHandler = (HttpControllerHandler)HttpContext.Current.Handler;
 
-            var routeValues = mvcHandler.RequestContext.RouteData.Values;
+            var requestMessage = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
+
+            var routedata = requestMessage.GetRouteData();
+            var routeValues = routedata.Values;
 
             var containsKey = routeValues.ContainsKey("repository");
 
