@@ -22,12 +22,13 @@ using System.Web.Http.WebHost;
 using System.Web.Http.WebHost.Routing;
 using System.Net.Http;
 
-namespace Nuget.Lucene.Web.Extension
+namespace NuGet.Lucene.Web.Extension
 {
    public class NuGetMultiRepositoryWebApiModule : NinjectModule
-    {
+   {
         public const string AppSettingNamesapce = "NuGet.Lucene.Web:";
-        public const string DefaultRoutePathPrefix = "repository/{repository}/api/";
+        public const string DefaultRoutePathPrefix = "api/";
+        public const string DefaultRepositoryRoutePrefix = "repository/{repository}/";
 
         public override void Load()
         {
@@ -53,13 +54,13 @@ namespace Nuget.Lucene.Web.Extension
 
             Kernel.Components.Add<IInjectionHeuristic, NonDecoratedPropertyInjectionHeuristic>();
 
-            var routeMapper = new NuGetWebApiRouteMapper(RoutePathPrefix);
+            var routeMapper = new NuGetMultiRepositoryWebApiRouteMapper(RoutePathPrefix, RepositoryPathPrefix);
             var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
             var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(cfg2.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
             var usersDataProvider = InitializeUsersDataProvider(cfg.LuceneIndexPath);
             var usersDataProvider2 = InitializeUsersDataProvider(cfg2.LuceneIndexPath);
 
-            Bind<NuGetWebApiRouteMapper>().ToConstant(routeMapper);
+            Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
 
             Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).When(req => IsRepo("repo1")).OnDeactivation(_ => cfg.Dispose());
             Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository).When(req => IsRepo("repo1"));
@@ -152,6 +153,11 @@ namespace Nuget.Lucene.Web.Extension
         public static string RoutePathPrefix
         {
             get { return GetAppSetting("routePathPrefix", DefaultRoutePathPrefix); }
+        }
+
+        public static string RepositoryPathPrefix
+        {
+            get { return GetAppSetting("repositoryRoutePathPrefix", DefaultRepositoryRoutePrefix); }
         }
 
         public static string PackageMirrorTargetUrl

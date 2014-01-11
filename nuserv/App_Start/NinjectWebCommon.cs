@@ -19,7 +19,7 @@ namespace nuserv.App_Start
     using System.Web.Mvc;
     using System.Reflection;
     using Ninject.Web.WebApi;
-    using Nuget.Lucene.Web.Extension;
+    using NuGet.Lucene.Web.Extension;
 
     public static class NinjectWebCommon 
     {
@@ -63,7 +63,7 @@ namespace nuserv.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            var routeMapper = kernel.Get<NuGetWebApiRouteMapper>();
+            var routeMapper = kernel.Get<NuGetMultiRepositoryWebApiRouteMapper>();
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
             
             //Currently not working!
