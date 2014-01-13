@@ -1,6 +1,7 @@
 ﻿using Ninject;
 using Ninject.Parameters;
 using Ninject.Syntax;
+using nuserv.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,19 +11,20 @@ namespace nuserv.Utility
 {
     public class DependencyResolver : DependencyScope, IDependencyResolver
     {
-        private readonly IResolutionRoot resolutionRoot;
+        private readonly IResolutionRootResolver resolutionRootResolver;
         private readonly IChildKernelFactory childKernelFactory;
 
-        public DependencyResolver(IResolutionRoot resolutionRoot, IChildKernelFactory childKernelFactory)
-            : base(resolutionRoot)
+        public DependencyResolver(IResolutionRootResolver resolutionRootResolver, IChildKernelFactory childKernelFactory)
+            : base(resolutionRootResolver.Resolve())
         {
-            this.resolutionRoot = resolutionRoot;
+            this.resolutionRootResolver = resolutionRootResolver;
             this.childKernelFactory = childKernelFactory;
         }
 
         public IDependencyScope BeginScope()
         {
-            return new DependencyScope(this.childKernelFactory.Create(this.resolutionRoot));
+            var resolutionRoot = this.resolutionRootResolver.Resolve();
+            return new DependencyScope(this.childKernelFactory.Create(resolutionRoot));
         }
     }
 }

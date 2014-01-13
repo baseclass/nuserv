@@ -26,81 +26,25 @@ namespace NuGet.Lucene.Web.Extension
 {
    public class NuGetMultiRepositoryWebApiModule : NinjectModule
    {
-        public const string AppSettingNamesapce = "NuGet.Lucene.Web:";
+        public const string AppSettingNamespace = "NuGet.Lucene.Web:";
         public const string DefaultRoutePathPrefix = "api/";
         public const string DefaultRepositoryRoutePrefix = "repository/{repository}/";
 
         public override void Load()
         {
-            var cfg = new LuceneRepositoryConfigurator
-                {
-                    EnablePackageFileWatcher = GetFlagFromAppSetting("enablePackageFileWatcher", true),
-                    GroupPackageFilesById = GetFlagFromAppSetting("groupPackageFilesById", true),
-                    LuceneIndexPath = MapPathFromAppSetting("lucenePath", "~/App_Data/repo1/Lucene"),
-                    PackagePath = MapPathFromAppSetting("packagesPath", "~/App_Data/repo1/Packages")
-                };
-
-            var cfg2 = new LuceneRepositoryConfigurator
-            {
-                EnablePackageFileWatcher = GetFlagFromAppSetting("enablePackageFileWatcher", true),
-                GroupPackageFilesById = GetFlagFromAppSetting("groupPackageFilesById", true),
-                LuceneIndexPath = MapPathFromAppSetting("lucenePath", "~/App_Data/repo2/Lucene"),
-                PackagePath = MapPathFromAppSetting("packagesPath", "~/App_Data/repo2/Packages")
-            };
-
-            cfg.Initialize();
-
-            cfg2.Initialize();
-
             Kernel.Components.Add<IInjectionHeuristic, NonDecoratedPropertyInjectionHeuristic>();
 
-
-
             var routeMapper = new NuGetMultiRepositoryWebApiRouteMapper(RoutePathPrefix, RepositoryPathPrefix);
-            var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
-            var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(cfg2.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
             var usersDataProvider = InitializeUsersDataProvider(HostingEnvironment.MapPath("~/App_Data/"));
 
             Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
 
-            Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).When(req => IsRepo("repo1")).OnDeactivation(_ => cfg.Dispose());
-            Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository).When(req => IsRepo("repo1"));
-            Bind<LuceneDataProvider>().ToConstant(cfg.Provider).When(req => IsRepo("repo1"));
-            Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));//.When(req => IsRepo("repo1"));
-
-            Bind<ILucenePackageRepository>().ToConstant(cfg2.Repository).When(req => IsRepo("repo2")).OnDeactivation(_ => cfg.Dispose());
-            Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository2).When(req => IsRepo("repo2"));
-            Bind<LuceneDataProvider>().ToConstant(cfg2.Provider).When(req => IsRepo("repo2"));
+            Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));
             
             LoadAuthentication();
 
             var tokenSource = new ReusableCancellationTokenSource();
             Bind<ReusableCancellationTokenSource>().ToConstant(tokenSource);
-
-            if (GetFlagFromAppSetting("synchronizeOnStart", true))
-            {
-                cfg.Repository.SynchronizeWithFileSystem(tokenSource.Token);
-                cfg2.Repository.SynchronizeWithFileSystem(tokenSource.Token);  
-            }
-        }
-
-        private static bool IsRepo(string repository)
-        {
-            var mvcHandler = (HttpControllerHandler)HttpContext.Current.Handler;
-
-            var requestMessage = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
-
-            var routedata = requestMessage.GetRouteData();
-            var routeValues = routedata.Values;
-
-            var containsKey = routeValues.ContainsKey("repository");
-
-            if (!containsKey)
-            {
-                return false;
-            }
-
-            return (string)routeValues["repository"] == repository;
         }
 
         public virtual void LoadAuthentication()
@@ -160,38 +104,12 @@ namespace NuGet.Lucene.Web.Extension
             get { return GetAppSetting("repositoryRoutePathPrefix", DefaultRepositoryRoutePrefix); }
         }
 
-        public static string PackageMirrorTargetUrl
-        {
-            get { return GetAppSetting("packageMirrorTargetUrl", string.Empty); }
-        }
-
-        public static TimeSpan PackageMirrorTimeout
-        {
-            get
-            {
-                var str = GetAppSetting("packageMirrorTimeout", "0:00:15");
-                TimeSpan ts;
-                return TimeSpan.TryParse(str, out ts) ? ts : TimeSpan.FromSeconds(15);
-            }
-        }
         internal static bool GetFlagFromAppSetting(string key, bool defaultValue)
         {
             var flag = GetAppSetting(key, string.Empty);
 
             bool result;
             return bool.TryParse(flag ?? string.Empty, out result) ? result : defaultValue;
-        }
-        
-        internal static string MapPathFromAppSetting(string key, string defaultValue)
-        {
-            var path = GetAppSetting(key, defaultValue);
-
-            if (path.StartsWith("~/"))
-            {
-                return HostingEnvironment.MapPath(path);
-            }
-
-            return path;
         }
 
         internal static string GetAppSetting(string key, string defaultValue)
@@ -202,7 +120,7 @@ namespace NuGet.Lucene.Web.Extension
 
         private static string GetAppSettingKey(string key)
         {
-            return AppSettingNamesapce + key;
+            return AppSettingNamespace + key;
         }
     }
 }
