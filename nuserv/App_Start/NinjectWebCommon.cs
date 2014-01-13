@@ -50,8 +50,12 @@ namespace nuserv.App_Start
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel(new NuGetMultiRepositoryWebApiModule());
+            
             kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
+
+            kernel.Unbind<System.Web.Http.Dependencies.IDependencyResolver>();
+            kernel.Bind<System.Web.Http.Dependencies.IDependencyResolver>().To<Utility.DependencyResolver>();
 
             RegisterServices(kernel);
             return kernel;
