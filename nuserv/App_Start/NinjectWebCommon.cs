@@ -20,6 +20,7 @@ namespace nuserv.App_Start
     using System.Reflection;
     using Ninject.Web.WebApi;
     using NuGet.Lucene.Web.Extension;
+    using nuserv.Utility;
 
     public static class NinjectWebCommon 
     {
@@ -73,17 +74,7 @@ namespace nuserv.App_Start
             //Currently not working!
             //routeMapper.MapDataServiceRoutes(RouteTable.Routes);
 
-            var config = GlobalConfiguration.Configuration;
-
-            config.Formatters.Add(new PackageFormDataMediaFormatter());
-
-            // load xml documentation for assemblies
-            var documentation = new HtmlDocumentation();
-            documentation.Load();
-            config.Services.Replace(typeof(IDocumentationProvider), new WebApiHtmlDocumentationProvider(documentation));
-
-            // register the formatter
-            config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
+            kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>();
         }        
     }
 }
