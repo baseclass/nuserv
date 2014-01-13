@@ -21,6 +21,7 @@ namespace nuserv.App_Start
     using Ninject.Web.WebApi;
     using NuGet.Lucene.Web.Extension;
     using nuserv.Utility;
+    using nuserv.Service;
 
     public static class NinjectWebCommon 
     {
@@ -34,6 +35,9 @@ namespace nuserv.App_Start
             DynamicModuleUtility.RegisterModule(typeof(OnePerRequestHttpModule));
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
             bootstrapper.Initialize(CreateKernel);
+
+            var repositoryKernelService = bootstrapper.Kernel.Get<IRepositoryKernelService>();
+            repositoryKernelService.Init();
         }
         
         /// <summary>
@@ -74,7 +78,9 @@ namespace nuserv.App_Start
             //Currently not working!
             //routeMapper.MapDataServiceRoutes(RouteTable.Routes);
 
-            kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>();
+            kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>().InSingletonScope();
+            kernel.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
+            kernel.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
         }        
     }
 }
