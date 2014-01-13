@@ -262,7 +262,9 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\IRepositoryKernelService.cs" />
+    <Compile Include="Service\IResolutionRootResolver.cs" />
     <Compile Include="Service\RepositoryKernelService.cs" />
+    <Compile Include="Service\ResolutionRootResolver.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utility\ChildKernelFactory.cs" />
     <Compile Include="Utility\DependencyResolver.cs" />
