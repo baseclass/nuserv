@@ -54,10 +54,12 @@ namespace NuGet.Lucene.Web.Extension
 
             Kernel.Components.Add<IInjectionHeuristic, NonDecoratedPropertyInjectionHeuristic>();
 
+
+
             var routeMapper = new NuGetMultiRepositoryWebApiRouteMapper(RoutePathPrefix, RepositoryPathPrefix);
             var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
             var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(cfg2.Repository, PackageMirrorTargetUrl, PackageMirrorTimeout);
-            var usersDataProvider = InitializeUsersDataProvider("~/App_Data/");
+            var usersDataProvider = InitializeUsersDataProvider(HostingEnvironment.MapPath("~/App_Data/"));
 
             Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
 
