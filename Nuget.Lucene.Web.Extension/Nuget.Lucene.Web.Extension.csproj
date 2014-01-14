@@ -175,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\NuGetMultiRepositoryDocumentationController.cs" />
+    <Compile Include="DynamicServiceRoute.cs" />
     <Compile Include="NuGetMultiRepositoryWebApiModule.cs" />
     <Compile Include="NuGetMultiRepositoryWebApiRouteMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

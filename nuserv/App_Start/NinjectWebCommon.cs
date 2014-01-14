@@ -1,86 +1,99 @@
 [assembly: WebActivator.PreApplicationStartMethod(typeof(nuserv.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(nuserv.App_Start.NinjectWebCommon), "Stop")]
 
+// ReSharper disable once CheckNamespace
+
 namespace nuserv.App_Start
 {
+    #region Usings
+
     using System;
     using System.Web;
+    using System.Web.Http;
+    using System.Web.Http.Dependencies;
+    using System.Web.Routing;
 
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
     using Ninject;
     using Ninject.Web.Common;
-    using NuGet.Lucene.Web;
-    using System.Web.Routing;
-    using System.Web.Http;
-    using AspNet.WebApi.HtmlMicrodataFormatter;
-    using System.Web.Http.Description;
-    using NuGet.Lucene.Web.Formatters;
-    using System.Web.Mvc;
-    using System.Reflection;
-    using Ninject.Web.WebApi;
-    using NuGet.Lucene.Web.Extension;
-    using nuserv.Utility;
-    using nuserv.Service;
 
-    public static class NinjectWebCommon 
+    using NuGet.Lucene.Web.Extension;
+
+    using nuserv.Service;
+    using nuserv.Utility;
+
+    #endregion
+
+    public static class NinjectWebCommon
     {
-        private static readonly Bootstrapper bootstrapper = new Bootstrapper();
+        #region Static Fields
+
+        private static readonly Bootstrapper Bootstrapper = new Bootstrapper();
+
+        #endregion
+
+        #region Public Methods and Operators
 
         /// <summary>
-        /// Starts the application
+        ///     Starts the application
         /// </summary>
-        public static void Start() 
+        public static void Start()
         {
             DynamicModuleUtility.RegisterModule(typeof(OnePerRequestHttpModule));
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
-            bootstrapper.Initialize(CreateKernel);
+            Bootstrapper.Initialize(CreateKernel);
 
-            var repositoryKernelService = bootstrapper.Kernel.Get<IRepositoryKernelService>();
+            var repositoryKernelService = Bootstrapper.Kernel.Get<IRepositoryKernelService>();
             repositoryKernelService.Init();
         }
-        
+
         /// <summary>
-        /// Stops the application.
+        ///     Stops the application.
         /// </summary>
         public static void Stop()
         {
-            bootstrapper.ShutDown();
+            Bootstrapper.ShutDown();
         }
-        
+
+        #endregion
+
+        #region Methods
+
         /// <summary>
-        /// Creates the kernel that will manage your application.
+        ///     Creates the kernel that will manage your application.
         /// </summary>
         /// <returns>The created kernel.</returns>
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel(new NuGetMultiRepositoryWebApiModule());
-            
+
             kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
 
-            kernel.Unbind<System.Web.Http.Dependencies.IDependencyResolver>();
-            kernel.Bind<System.Web.Http.Dependencies.IDependencyResolver>().To<Utility.DependencyResolver>();
+            kernel.Unbind<IDependencyResolver>();
+            kernel.Bind<IDependencyResolver>().To<DependencyResolver>();
 
             RegisterServices(kernel);
             return kernel;
         }
 
         /// <summary>
-        /// Load your modules or register your services here!
+        ///     Load your modules or register your services here!
         /// </summary>
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
             var routeMapper = kernel.Get<NuGetMultiRepositoryWebApiRouteMapper>();
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
-            
-            //Currently not working!
-            //routeMapper.MapDataServiceRoutes(RouteTable.Routes);
+
+            routeMapper.MapDataServiceRoutes(RouteTable.Routes);
 
             kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>().InSingletonScope();
             kernel.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
             kernel.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
-        }        
+        }
+
+        #endregion
     }
 }
