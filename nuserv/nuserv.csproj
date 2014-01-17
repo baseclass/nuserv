@@ -258,7 +258,9 @@
     <Compile Include="App_Start\NuservModule.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="WebApi\Controllers\RepositoryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -330,6 +332,7 @@
     <Folder Include="App_Data\repo2\Lucene\" />
     <Folder Include="App_Data\repo2\Packages\" />
     <Folder Include="App_Data\Users\" />
+    <Folder Include="WebApi\Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

@@ -21,6 +21,7 @@
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
@@ -34,7 +35,7 @@
             config.Services.Replace(typeof(IDocumentationProvider), new WebApiHtmlDocumentationProvider(documentation));
 
             // register the formatter
-            config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
+            // config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
         }
 
         #endregion
