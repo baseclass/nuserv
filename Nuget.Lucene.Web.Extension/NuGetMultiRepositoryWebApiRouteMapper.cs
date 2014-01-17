@@ -40,7 +40,7 @@
         {
             get
             {
-                return this.repositoryPrefix + this.PathPrefix + "odata";
+                return this.repositoryPrefix + this.PathPrefix + "api/v2";
             }
         }
 
@@ -49,14 +49,6 @@
             get
             {
                 return this.pathPrefix;
-            }
-        }
-
-        public string SignalrRoutePath
-        {
-            get
-            {
-                return this.PathPrefix + "signalr";
             }
         }
 
@@ -70,95 +62,95 @@
 
             routes.MapHttpRoute(
                 AspNet.WebApi.HtmlMicrodataFormatter.RouteNames.ApiDocumentation,
-                this.pathPrefix,
+                this.pathPrefix + "api",
                 new { controller = "NuGetMultiRepositoryDocumentation", action = "GetApiDocumentation" });
 
             routes.MapHttpRoute(
                 AspNet.WebApi.HtmlMicrodataFormatter.RouteNames.TypeDocumentation,
-                this.pathPrefix + "schema/{typeName}",
+                this.pathPrefix + "api/schema/{typeName}",
                 new { controller = "NuGetDocumentation", action = "GetTypeDocumentation" });
 
             routes.MapHttpRoute(
                 RouteNames.Indexing,
-                this.pathPrefix + "indexing/{action}",
+                this.pathPrefix + "api/indexing/{action}",
                 new { controller = "Indexing" });
 
             routes.MapHttpRoute(
                 RouteNames.Users.All,
-                this.pathPrefix + "users",
+                this.pathPrefix + "api/users",
                 new { controller = "Users", action = "GetAllUsers" },
                 new { httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options) });
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetUser,
-                this.pathPrefix + "users/{*username}",
+                this.pathPrefix + "api/users/{*username}",
                 new { controller = "Users", action = "Get" },
                 new { username = ".+", method = new HttpMethodConstraint(HttpMethod.Get) });
 
             routes.MapHttpRoute(
                 RouteNames.Users.PutUser,
-                this.pathPrefix + "users/{*username}",
+                this.pathPrefix + "api/users/{*username}",
                 new { controller = "Users", action = "Put" },
                 new { username = ".+" });
 
             routes.MapHttpRoute(
                 RouteNames.Users.DeleteUser,
-                this.pathPrefix + "users/{*username}",
+                this.pathPrefix + "api/users/{*username}",
                 new { controller = "Users", action = "Delete" },
                 new { username = ".+" });
 
             routes.MapHttpRoute(
                 RouteNames.Users.DeleteAll,
-                this.pathPrefix + "users",
+                this.pathPrefix + "api/users",
                 new { controller = "Users", action = "DeleteAllUsers" },
                 new { httpMethod = new HttpMethodConstraint(HttpMethod.Delete) });
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetAuthenticationInfo,
-                this.pathPrefix + "session",
+                this.pathPrefix + "api/session",
                 new { controller = "Users", action = "GetAuthenticationInfo" });
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetRequiredAuthenticationInfo,
-                this.pathPrefix + "authenticate",
+                this.pathPrefix + "api/authenticate",
                 new { controller = "Users", action = "GetRequiredAuthenticationInfo" });
 
             routes.MapHttpRoute(
                 RouteNames.TabCompletionPackageIds,
-                this.repositoryPrefix + this.pathPrefix + "v2/package-ids",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package-ids",
                 new { controller = "TabCompletion", action = "GetMatchingPackages" });
 
             routes.MapHttpRoute(
                 RouteNames.TabCompletionPackageVersions,
-                this.repositoryPrefix + this.pathPrefix + "v2/package-versions/{packageId}",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package-versions/{packageId}",
                 new { controller = "TabCompletion", action = "GetPackageVersions" });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Search,
-                this.repositoryPrefix + this.pathPrefix + "packages",
+                this.repositoryPrefix + this.pathPrefix + "api/packages",
                 new { controller = "Packages", action = "Search" },
                 new { httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options) });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Upload,
-                this.repositoryPrefix + this.pathPrefix + "packages",
+                this.repositoryPrefix + this.pathPrefix + "package",
                 new { controller = "Packages" },
                 new { httpMethod = new HttpMethodConstraint(HttpMethod.Put, HttpMethod.Options) });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.DownloadLatestVersion,
-                this.repositoryPrefix + this.pathPrefix + "packages/{id}/content",
+                this.repositoryPrefix + this.pathPrefix + "package/{id}",
                 new { controller = "Packages", action = "DownloadPackage" });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Download,
-                this.repositoryPrefix + this.pathPrefix + "packages/{id}/{version}/content",
+                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}",
                 new { controller = "Packages", action = "DownloadPackage" },
                 new { version = new SemanticVersionConstraint() });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Info,
-                this.repositoryPrefix + this.pathPrefix + "packages/{id}/{version}",
+                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}/info",
                 new { controller = "Packages", action = "GetPackageInfo", version = "" },
                 new
                 {
@@ -168,7 +160,7 @@
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Delete,
-                this.repositoryPrefix + this.pathPrefix + "packages/{id}/{version}",
+                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}",
                 new { controller = "Packages", action = "DeletePackage" },
                 new { version = new SemanticVersionConstraint() });
         }

@@ -27,7 +27,7 @@
 
         public const string DefaultRepositoryRoutePrefix = "repository/{repository}/";
 
-        public const string DefaultRoutePathPrefix = "api/";
+        public const string DefaultRoutePathPrefix = "";
 
         #endregion
 
