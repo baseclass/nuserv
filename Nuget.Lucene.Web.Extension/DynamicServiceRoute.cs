@@ -2,6 +2,11 @@
 {
     #region Usings
 
+    using System.Collections.ObjectModel;
+    using System.ServiceModel.Description;
+
+    #region Usings
+
     using System.Linq;
 
     using Ninject.Extensions.Wcf;
@@ -16,6 +21,8 @@
     using System.ServiceModel.Web;
     using System.Web;
     using System.Web.Routing;
+
+    #endregion
 
     #endregion
 
@@ -86,6 +93,36 @@
         #endregion
     }
 
+    public class RewriteBaseUrlBehavior : Attribute, IServiceBehavior
+    {
+        #region Public Methods and Operators
+
+        public void AddBindingParameters(
+            ServiceDescription serviceDescription,
+            ServiceHostBase serviceHostBase,
+            Collection<ServiceEndpoint> endpoints,
+            BindingParameterCollection bindingParameters)
+        {
+        }
+
+        public void ApplyDispatchBehavior(ServiceDescription serviceDescription, ServiceHostBase serviceHostBase)
+        {
+            foreach (var channelDispatcher in serviceHostBase.ChannelDispatchers.Cast<ChannelDispatcher>())
+            {
+                foreach (EndpointDispatcher endpointDispatcher in channelDispatcher.Endpoints)
+                {
+                    endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new RewriteBaseUrlMessageInspector());
+                }
+            }
+        }
+
+        public void Validate(ServiceDescription serviceDescription, ServiceHostBase serviceHostBase)
+        {
+        }
+
+        #endregion
+    }
+
     public class RewriteBaseUrlNinjectDataServiceHostFactory : NinjectDataServiceHostFactory
     {
         #region Public Methods and Operators
@@ -94,13 +131,7 @@
         {
             var serviceHostBase = base.CreateServiceHost(constructorString, baseAddresses);
 
-            foreach (var channelDispatcher in serviceHostBase.ChannelDispatchers.Cast<ChannelDispatcher>())
-            {
-                foreach (var endpointDispatcher in channelDispatcher.Endpoints)
-                {
-                    endpointDispatcher.DispatchRuntime.MessageInspectors.Add(new RewriteBaseUrlMessageInspector());
-                }
-            }
+            serviceHostBase.Description.Behaviors.Add(new RewriteBaseUrlBehavior());
 
             return serviceHostBase;
         }
