@@ -1,46 +1,52 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "nuserv repositories";
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/knockout")
+    <script type="text/javascript">
+        function RepositoriesViewModel() {
+            var self = this;
+            self.repositories = ko.observableArray();
+
+            self.repositoryRows = ko.computed(function () {
+                var reps = this.repositories();
+                var result = [];
+                for (var i = 0; i < reps.length; i += 4) {
+                    var row = [];
+                    for (var j = 0; j < 4; ++j) {
+                        if (reps[i + j]) {
+                            row.push(reps[i + j]);
+                        }
+                    }
+                    result.push(row);
+                }
+                return result;
+            }, self);
+
+            var baseUri = '@ViewBag.ApiUrl';
+            $.getJSON(baseUri, self.repositories);
+        }
+
+        $(document).ready(function () {
+            ko.applyBindings(new RepositoriesViewModel());
+        });
+    </script>
 }
 
 <div class="jumbotron">
     <h1>repositories</h1>
     <p>manage repositories</p>
 </div>
-<div class="row">
-    <div class="col-md-3">
-        <h3><i class="fa fa-archive fa-align-left" ></i> external\curated1</h3>
-        <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Edit</a></p>
-    </div>
-    <div class="col-md-3">
-        <h3><i class="fa fa-archive fa-align-left"></i> external\curated2</h3>
-        <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Edit</a></p>
-    </div>
-    <div class="col-md-3">
-        <h3><i class="fa fa-archive fa-align-left"></i> test</h3>
-        <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Edit</a></p>
-    </div>
-    <div class="col-md-3">
-        <h3><i class="fa fa-archive fa-align-left"></i> integration</h3>
-        <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Edit</a></p>
-    </div>
-    <div class="col-md-3">
-        <h3><i class="fa fa-archive fa-align-left"></i> production</h3>
-        <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Edit</a></p>
+<div class="container" data-bind="foreach: repositoryRows, visible: repositories().length > 0" style="display: none">
+    <div class="row" data-bind="foreach: $data">
+        <div class="col-md-3">
+            <h3><i class="fa fa-archive fa-align-left"></i> <span data-bind="text: Name"></span></h3>
+            <p>
+                <span data-bind="text: Description"></span>
+            </p>
+            <p><a class="btn btn-default">Edit</a></p>
+        </div>
     </div>
 </div>
