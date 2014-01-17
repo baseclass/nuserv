@@ -100,6 +100,7 @@ namespace nuserv.App_Start
             kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>().InSingletonScope();
             kernel.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
             kernel.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
+            kernel.Bind<IHttpRouteDataResolver>().To<HttpRouteDataResolver>().InSingletonScope();
         }
 
         #endregion

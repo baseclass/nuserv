@@ -270,7 +270,9 @@
     <Compile Include="Utility\DependencyResolver.cs" />
     <Compile Include="Utility\DependencyResolverInstanceProvider.cs" />
     <Compile Include="Utility\DependencyScope.cs" />
+    <Compile Include="Utility\HttpRouteDataResolver.cs" />
     <Compile Include="Utility\IChildKernelFactory.cs" />
+    <Compile Include="Utility\IHttpRouteDataResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />

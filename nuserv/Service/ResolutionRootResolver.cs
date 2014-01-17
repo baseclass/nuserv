@@ -1,52 +1,61 @@
-﻿using Ninject.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
-
-namespace nuserv.Service
+﻿namespace nuserv.Service
 {
+    #region Usings
+
+    using System;
+
+    using Ninject.Syntax;
+
+    using nuserv.Utility;
+
+    #endregion
+
     public class ResolutionRootResolver : IResolutionRootResolver
     {
-        private readonly HttpRequestMessage requestMessage;
+        #region Fields
 
         private readonly IRepositoryKernelService repositoryKernelService;
 
         private readonly IResolutionRoot resolutionRoot;
 
-        public ResolutionRootResolver(HttpRequestMessage requestMessage, 
-                                      IRepositoryKernelService repositoryKernelService, 
-                                      IResolutionRoot resolutionRoot)
+        private readonly IHttpRouteDataResolver routeDataResolver;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public ResolutionRootResolver(
+            IHttpRouteDataResolver routeDataResolver,
+            IRepositoryKernelService repositoryKernelService,
+            IResolutionRoot resolutionRoot)
         {
-            this.requestMessage = requestMessage;
+            this.routeDataResolver = routeDataResolver;
             this.resolutionRoot = resolutionRoot;
             this.repositoryKernelService = repositoryKernelService;
         }
 
-        public Ninject.Syntax.IResolutionRoot Resolve()
+        #endregion
+
+        #region Public Methods and Operators
+
+        public IResolutionRoot Resolve()
         {
-            //var routeData = this.requestMessage.GetRouteData();
+            var routeData = this.routeDataResolver.Resolve();
 
-            if (HttpContext.Current != null)
+            if (routeData != null && routeData.Values.ContainsKey("repository"))
             {
-                var requestMessage = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
-
-                var routeData = requestMessage.GetRouteData();
-
-                if (routeData != null && routeData.Values.ContainsKey("repository"))
+                var repositoryName = (string)routeData.Values["repository"];
+                if (this.repositoryKernelService.RepositoryExists(repositoryName))
                 {
-                    var repositoryName = (string)routeData.Values["repository"];
-                    if (this.repositoryKernelService.RepositoryExists(repositoryName))
-                    {
-                        return this.repositoryKernelService.GetChildKernel(repositoryName);
-                    }
-
-                    throw new InvalidOperationException(string.Format("Repository doesn't exist: {0}", repositoryName));
+                    return this.repositoryKernelService.GetChildKernel(repositoryName);
                 }
+
+                throw new InvalidOperationException(string.Format("Repository doesn't exist: {0}", repositoryName));
             }
 
-            return resolutionRoot;
+            return this.resolutionRoot;
         }
+
+        #endregion
     }
 }
