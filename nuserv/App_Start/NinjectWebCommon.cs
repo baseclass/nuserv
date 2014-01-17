@@ -8,22 +8,14 @@ namespace nuserv.App_Start
     #region Usings
 
     using System;
-    using System.ServiceModel.Dispatcher;
     using System.Web;
-    using System.Web.Http;
-    using System.Web.Http.Dependencies;
-    using System.Web.Routing;
 
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
     using Ninject;
-    using Ninject.Parameters;
     using Ninject.Web.Common;
 
     using NuGet.Lucene.Web.Extension;
-
-    using nuserv.Service;
-    using nuserv.Utility;
 
     #endregion
 
@@ -45,9 +37,6 @@ namespace nuserv.App_Start
             DynamicModuleUtility.RegisterModule(typeof(OnePerRequestHttpModule));
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
             Bootstrapper.Initialize(CreateKernel);
-
-            var repositoryKernelService = Bootstrapper.Kernel.Get<IRepositoryKernelService>();
-            repositoryKernelService.Init();
         }
 
         /// <summary>
@@ -73,15 +62,6 @@ namespace nuserv.App_Start
             kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
             kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
 
-            kernel.Unbind<IDependencyResolver>();
-            kernel.Bind<IDependencyResolver>().To<DependencyResolver>();
-
-            kernel.Bind<IInstanceProvider>().To<DependencyResolverInstanceProvider>();
-            kernel.Unbind<Func<Type, IInstanceProvider>>();
-            kernel.Bind<Func<Type, IInstanceProvider>>()
-                .ToMethod(
-                    ctx => type => ctx.Kernel.Get<IInstanceProvider>(new ConstructorArgument("serviceType", type)));
-
             RegisterServices(kernel);
             return kernel;
         }
@@ -92,15 +72,7 @@ namespace nuserv.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            var routeMapper = kernel.Get<NuGetMultiRepositoryWebApiRouteMapper>();
-            routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
-
-            routeMapper.MapDataServiceRoutes(RouteTable.Routes);
-
-            kernel.Bind<IChildKernelFactory>().To<ChildKernelFactory>().InSingletonScope();
-            kernel.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
-            kernel.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
-            kernel.Bind<IHttpRouteDataResolver>().To<HttpRouteDataResolver>().InSingletonScope();
+            kernel.Load(new NuservModule());
         }
 
         #endregion
