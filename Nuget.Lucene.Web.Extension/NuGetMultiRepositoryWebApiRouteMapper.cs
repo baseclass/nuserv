@@ -133,24 +133,24 @@
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Upload,
-                this.repositoryPrefix + this.pathPrefix + "package",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package",
                 new { controller = "Packages" },
                 new { httpMethod = new HttpMethodConstraint(HttpMethod.Put, HttpMethod.Options) });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.DownloadLatestVersion,
-                this.repositoryPrefix + this.pathPrefix + "package/{id}",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}",
                 new { controller = "Packages", action = "DownloadPackage" });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Download,
-                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}",
                 new { controller = "Packages", action = "DownloadPackage" },
                 new { version = new SemanticVersionConstraint() });
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Info,
-                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}/info",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}/info",
                 new { controller = "Packages", action = "GetPackageInfo", version = "" },
                 new
                 {
@@ -160,7 +160,7 @@
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Delete,
-                this.repositoryPrefix + this.pathPrefix + "package/{id}/{version}",
+                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}",
                 new { controller = "Packages", action = "DeletePackage" },
                 new { version = new SemanticVersionConstraint() });
         }
