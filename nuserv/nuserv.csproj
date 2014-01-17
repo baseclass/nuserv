@@ -268,6 +268,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Utility\ChildKernelFactory.cs" />
     <Compile Include="Utility\DependencyResolver.cs" />
+    <Compile Include="Utility\DependencyResolverInstanceProvider.cs" />
     <Compile Include="Utility\DependencyScope.cs" />
     <Compile Include="Utility\IChildKernelFactory.cs" />
   </ItemGroup>
