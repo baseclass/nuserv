@@ -122,11 +122,15 @@
         {
             this.Bind<IApiKeyAuthentication>().To<LuceneApiKeyAuthentication>();
 
-            this.Bind<IHttpModule>().To<ApiKeyAuthenticationModule>();
-
             if (AllowAnonymousPackageChanges)
             {
                 this.Bind<IHttpModule>().To<AnonymousPackageManagerModule>();
+            }
+            else
+            {
+                // ApiKeyAuthenticationModule fails if there is a wrong api key, it's not possible to push a package with Nuget Package Explorer without api key.
+                // So just load this module if anonymous package changes are not allowed. Differs from default NuGet.Lucene.Web implementation.
+                this.Bind<IHttpModule>().To<ApiKeyAuthenticationModule>();
             }
 
             if (HandleLocalRequestsAsAdmin)
