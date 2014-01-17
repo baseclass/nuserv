@@ -46,23 +46,7 @@
                         PackageDataService
                         ))
                 });
-
-            docs.Add(
-                "Indexing",
-                new SimpleApiDescription(this.Request, "Hub", this.NuGetWebApiRouteMapper.SignalrRoutePath)
-                {
-                    Documentation
-                        =
-                        this
-                        .DocumentationProvider
-                        .GetDocumentation
-                        (
-                            typeof
-                        (
-                        StatusHub
-                        ))
-                });
-
+            
             return docs;
         }
 
