@@ -95,8 +95,9 @@
     <Reference Include="NuGet.Lucene">
       <HintPath>..\packages\NuGet.Lucene.2.1.0\lib\net451\NuGet.Lucene.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Lucene.Web">
-      <HintPath>..\packages\NuGet.Lucene.Web.2.1.0\lib\net451\NuGet.Lucene.Web.dll</HintPath>
+    <Reference Include="NuGet.Lucene.Web, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NuGet.Lucene.Web.2.2.2-nuserv\lib\net451\NuGet.Lucene.Web.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
