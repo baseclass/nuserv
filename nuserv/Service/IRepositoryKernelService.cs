@@ -1,19 +1,21 @@
-﻿using Ninject.Extensions.ChildKernel;
-using Ninject.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace nuserv.Service
+﻿namespace nuserv.Service
 {
+    #region Usings
+
+    using Ninject.Syntax;
+
+    #endregion
+
     public interface IRepositoryKernelService
     {
+        #region Public Methods and Operators
+
+        IResolutionRoot GetChildKernel(string name);
+
         void Init();
 
         bool RepositoryExists(string name);
 
-        IResolutionRoot GetChildKernel(string name);
+        #endregion
     }
 }

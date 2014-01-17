@@ -3,11 +3,8 @@
     #region Usings
 
     using System.Net.Http;
-    using System.ServiceModel.Activation;
     using System.Web.Http;
     using System.Web.Routing;
-
-    using Ninject.Extensions.Wcf;
 
     using NuGet.Lucene.Web.DataServices;
 
@@ -180,7 +177,12 @@
         {
             var dataServiceHostFactory = new RewriteBaseUrlNinjectDataServiceHostFactory();
 
-            var serviceRoute = new DynamicServiceRoute(this.ODataRoutePath, RouteNames.PackageFeedRouteValues, null, dataServiceHostFactory, typeof(PackageDataService));
+            var serviceRoute = new DynamicServiceRoute(
+                this.ODataRoutePath,
+                RouteNames.PackageFeedRouteValues,
+                null,
+                dataServiceHostFactory,
+                typeof(PackageDataService));
 
             routes.Add(RouteNames.Packages.Feed, serviceRoute);
         }

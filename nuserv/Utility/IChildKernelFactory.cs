@@ -1,15 +1,18 @@
-﻿using Ninject.Extensions.ChildKernel;
-using Ninject.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace nuserv.Utility
+﻿namespace nuserv.Utility
 {
+    #region Usings
+
+    using Ninject.Extensions.ChildKernel;
+    using Ninject.Syntax;
+
+    #endregion
+
     public interface IChildKernelFactory
     {
+        #region Public Methods and Operators
+
         IChildKernel Create(IResolutionRoot resolutionRoot);
+
+        #endregion
     }
 }

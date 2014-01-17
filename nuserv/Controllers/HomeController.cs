@@ -1,23 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-
-namespace nuserv.Controllers
+﻿namespace nuserv.Controllers
 {
+    #region Usings
+
+    using System.Web.Mvc;
+
+    #endregion
+
     public class HomeController : Controller
     {
-        public ActionResult Index()
-        {
-            return View();
-        }
+        #region Public Methods and Operators
 
         public ActionResult About()
         {
-            ViewBag.Message = "nuserv";
+            this.ViewBag.Message = "nuserv";
 
-            return View();
+            return this.View();
         }
+
+        public ActionResult Index()
+        {
+            return this.View();
+        }
+
+        #endregion
     }
 }

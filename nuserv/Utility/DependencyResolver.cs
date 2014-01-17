@@ -1,30 +1,44 @@
-﻿using Ninject;
-using Ninject.Parameters;
-using Ninject.Syntax;
-using nuserv.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http.Dependencies;
-
-namespace nuserv.Utility
+﻿namespace nuserv.Utility
 {
+    #region Usings
+
+    using System.Web.Http.Dependencies;
+
+    using nuserv.Service;
+
+    #endregion
+
     public class DependencyResolver : DependencyScope, IDependencyResolver
     {
-        private readonly IResolutionRootResolver resolutionRootResolver;
+        #region Fields
+
         private readonly IChildKernelFactory childKernelFactory;
 
-        public DependencyResolver(IResolutionRootResolver resolutionRootResolver, IChildKernelFactory childKernelFactory)
+        private readonly IResolutionRootResolver resolutionRootResolver;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public DependencyResolver(
+            IResolutionRootResolver resolutionRootResolver,
+            IChildKernelFactory childKernelFactory)
             : base(resolutionRootResolver.Resolve())
         {
             this.resolutionRootResolver = resolutionRootResolver;
             this.childKernelFactory = childKernelFactory;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
         public IDependencyScope BeginScope()
         {
             var resolutionRoot = this.resolutionRootResolver.Resolve();
             return new DependencyScope(this.childKernelFactory.Create(resolutionRoot));
         }
+
+        #endregion
     }
 }

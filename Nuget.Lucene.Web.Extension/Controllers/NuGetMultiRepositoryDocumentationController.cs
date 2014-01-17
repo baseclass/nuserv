@@ -1,37 +1,71 @@
-﻿using AspNet.WebApi.HtmlMicrodataFormatter;
-using NuGet.Lucene.Web.DataServices;
-using NuGet.Lucene.Web.Hubs;
-
-namespace NuGet.Lucene.Web.Extension.Controllers
+﻿namespace NuGet.Lucene.Web.Extension.Controllers
 {
+    #region Usings
+
+    using AspNet.WebApi.HtmlMicrodataFormatter;
+
+    using NuGet.Lucene.Web.DataServices;
+    using NuGet.Lucene.Web.Hubs;
+
+    #endregion
+
     /// <summary>
-    /// Provides documentation and semantic information about various
-    /// resources and actions configured for use in this application.
+    ///     Provides documentation and semantic information about various
+    ///     resources and actions configured for use in this application.
     /// </summary>
     public class NuGetMultiRepositoryDocumentationController : DocumentationController
     {
+        #region Public Properties
+
         [Ninject.Inject]
         public NuGetMultiRepositoryWebApiRouteMapper NuGetWebApiRouteMapper { get; set; }
 
+        #endregion
+
+        #region Public Methods and Operators
+
         /// <summary>
-        /// Probably the document you are reading now.
+        ///     Probably the document you are reading now.
         /// </summary>
         public override SimpleApiDocumentation GetApiDocumentation()
         {
             var docs = base.GetApiDocumentation();
 
-            docs.Add("Packages", new SimpleApiDescription(Request, "OData", NuGetWebApiRouteMapper.ODataRoutePath)
+            docs.Add(
+                "Packages",
+                new SimpleApiDescription(this.Request, "OData", this.NuGetWebApiRouteMapper.ODataRoutePath)
                 {
-                    Documentation = DocumentationProvider.GetDocumentation(typeof(PackageDataService))
+                    Documentation
+                        =
+                        this
+                        .DocumentationProvider
+                        .GetDocumentation
+                        (
+                            typeof
+                        (
+                        PackageDataService
+                        ))
                 });
 
-            docs.Add("Indexing", new SimpleApiDescription(Request, "Hub", NuGetWebApiRouteMapper.SignalrRoutePath)
+            docs.Add(
+                "Indexing",
+                new SimpleApiDescription(this.Request, "Hub", this.NuGetWebApiRouteMapper.SignalrRoutePath)
                 {
-                    Documentation = DocumentationProvider.GetDocumentation(typeof(StatusHub))
+                    Documentation
+                        =
+                        this
+                        .DocumentationProvider
+                        .GetDocumentation
+                        (
+                            typeof
+                        (
+                        StatusHub
+                        ))
                 });
 
             return docs;
         }
-    }
 
+        #endregion
+    }
 }

@@ -8,7 +8,6 @@ namespace nuserv.App_Start
     #region Usings
 
     using System;
-    using System.ServiceModel.Description;
     using System.ServiceModel.Dispatcher;
     using System.Web;
     using System.Web.Http;
@@ -21,7 +20,6 @@ namespace nuserv.App_Start
     using Ninject.Parameters;
     using Ninject.Web.Common;
 
-    using NuGet.Lucene.Web.DataServices;
     using NuGet.Lucene.Web.Extension;
 
     using nuserv.Service;
@@ -80,7 +78,9 @@ namespace nuserv.App_Start
 
             kernel.Bind<IInstanceProvider>().To<DependencyResolverInstanceProvider>();
             kernel.Unbind<Func<Type, IInstanceProvider>>();
-            kernel.Bind<Func<Type, IInstanceProvider>>().ToMethod(ctx => type => ctx.Kernel.Get<IInstanceProvider>(new ConstructorArgument("serviceType", type)));
+            kernel.Bind<Func<Type, IInstanceProvider>>()
+                .ToMethod(
+                    ctx => type => ctx.Kernel.Get<IInstanceProvider>(new ConstructorArgument("serviceType", type)));
 
             RegisterServices(kernel);
             return kernel;

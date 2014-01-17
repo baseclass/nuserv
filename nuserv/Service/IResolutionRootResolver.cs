@@ -1,13 +1,17 @@
-﻿using Ninject.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace nuserv.Service
+﻿namespace nuserv.Service
 {
+    #region Usings
+
+    using Ninject.Syntax;
+
+    #endregion
+
     public interface IResolutionRootResolver
     {
+        #region Public Methods and Operators
+
         IResolutionRoot Resolve();
+
+        #endregion
     }
 }

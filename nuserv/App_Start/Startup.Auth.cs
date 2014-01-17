@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.Owin;
-using Microsoft.Owin.Security.Cookies;
-using Owin;
-
-namespace nuserv
+﻿namespace nuserv
 {
+    #region Usings
+
+    using Owin;
+
+    #endregion
+
     public partial class Startup
     {
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
+
+        #region Public Methods and Operators
+
         public void ConfigureAuth(IAppBuilder app)
         {
             // Enable the application to use a cookie to store information for the signed in user
@@ -34,5 +38,7 @@ namespace nuserv
 
             //app.UseGoogleAuthentication();
         }
+
+        #endregion
     }
 }
