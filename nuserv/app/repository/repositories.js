@@ -14,12 +14,21 @@
             $scope.model.repositoryRows = [];
 
             $scope.$watch('model.repositories', function () {
-                var reps = $scope.model.repositories;
+                var reps = $scope.model.repositories.slice(0);
+
+                //Add new repository
+                reps.push({ Name: '', Description: '', isNew : true });
+
                 var result = [];
                 for (var i = 0; i < reps.length; i += 4) {
                     var row = [];
                     for (var j = 0; j < 4; ++j) {
                         if (reps[i + j]) {
+                            // Add isNew property
+                            if (typeof reps[i + j].isNew === 'undefined') {
+                                reps[i + j].isNew = false;
+                            }
+
                             row.push(reps[i + j]);
                         }
                     }
@@ -56,5 +65,23 @@
                     //We are done with AJAX loading
                     $scope.model.isAjaxInProgress = false;
                 });
-        }
+
+            $scope.save = function (repository) {
+                repository.errorName = '';
+                repository.errorDescription = '';
+
+                //Replace spaces in name
+                repository.Name = repository.Name.replace(/\s/g, "");
+
+                if (repository.Name.length < 3) {
+                    repository.errorName = "Name is to short";
+                }
+
+                if (repository.Description.length < 1) {
+                    repository.errorDescription = "Description is to short";
+                }
+
+                
+            };
+    }
     ]);
