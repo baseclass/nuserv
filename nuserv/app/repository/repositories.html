@@ -1,0 +1,22 @@
+﻿<div class="alert alert-danger alert-dismissable" style="margin-top: 30px;" ng-show="model.errorMessage != undefined">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong>Error!</strong>
+    <br />
+    {{ model.errorMessage }}
+</div>
+
+<div ng-show="model.repositoryRows.length == 0">
+    Start by creating a new repository!
+</div>
+
+<div class="container" ng-show="model.repositoryRows.length > 0">
+    <div class="row" ng-repeat="row in model.repositoryRows">
+        <div class="col-md-3" ng-repeat="repository in row">
+            <h3><i class="fa fa-archive fa-align-left"></i> <span>{{ repository.Name }}</span></h3>
+            <p>
+                <span>{{ repository.Description }}</span>
+            </p>
+            <p><a class="btn btn-default">Edit</a></p>
+        </div>
+    </div>
+</div>

@@ -284,6 +284,9 @@
     <Compile Include="WebApi\Models\Repository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\app.js" />
+    <Content Include="app\repository\repositories.html" />
+    <Content Include="app\repository\repositories.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />

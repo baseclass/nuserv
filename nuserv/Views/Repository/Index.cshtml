@@ -1,27 +1,19 @@
 ﻿@{
     ViewBag.Title = "nuserv repositories";
+    ViewBag.App = "repositoryApp";
 }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/angular")
-    <script type="text/javascript">
-        
-    </script>
+    <script src="/app/app.js" type="text/javascript" ></script>
+    <script src="/app/repository/repositories.js" type="text/javascript"></script>
 }
 
 <div class="jumbotron">
     <h1>repositories</h1>
     <p>manage repositories</p>
 </div>
-<div class="container" data-bind="foreach: repositoryRows, visible: repositories().length > 0" style="display: none">
-    <div class="row" data-bind="foreach: $data">
-        <div class="col-md-3">
-            <h3><i class="fa fa-archive fa-align-left"></i> <span data-bind="text: Name"></span></h3>
-            <p>
-                <span data-bind="text: Description"></span>
-            </p>
-            <p><a class="btn btn-default">Edit</a></p>
-        </div>
-    </div>
+
+<div class="container" ng-view>
 </div>
