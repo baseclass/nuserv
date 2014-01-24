@@ -81,6 +81,15 @@
                     repository.errorDescription = "Description is to short";
                 }
 
+                $http({
+                    url: '/api/repository',
+                    method: "POST",
+                    data: repository
+                }).success(function (data, status, headers, config) {
+                    alert('yuhuu!');
+                }).error(function (data, status, headers, config) {
+                    $scope.errorName = status;
+                });
                 
             };
     }

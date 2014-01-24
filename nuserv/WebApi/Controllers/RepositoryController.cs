@@ -36,7 +36,7 @@
         }
 
         // POST api/<controller>
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Repository repository)
         {
         }
 
