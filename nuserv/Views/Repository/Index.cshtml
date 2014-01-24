@@ -4,34 +4,9 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/knockout")
+    @Scripts.Render("~/bundles/angular")
     <script type="text/javascript">
-        function RepositoriesViewModel() {
-            var self = this;
-            self.repositories = ko.observableArray();
-
-            self.repositoryRows = ko.computed(function () {
-                var reps = this.repositories();
-                var result = [];
-                for (var i = 0; i < reps.length; i += 4) {
-                    var row = [];
-                    for (var j = 0; j < 4; ++j) {
-                        if (reps[i + j]) {
-                            row.push(reps[i + j]);
-                        }
-                    }
-                    result.push(row);
-                }
-                return result;
-            }, self);
-
-            var baseUri = '@ViewBag.ApiUrl';
-            $.getJSON(baseUri, self.repositories);
-        }
-
-        $(document).ready(function () {
-            ko.applyBindings(new RepositoriesViewModel());
-        });
+        
     </script>
 }
 
