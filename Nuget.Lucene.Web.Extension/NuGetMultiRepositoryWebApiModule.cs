@@ -15,6 +15,7 @@
     using Ninject.Selection.Heuristics;
 
     using NuGet.Lucene.Web.Authentication;
+    using NuGet.Lucene.Web.DataServices;
     using NuGet.Lucene.Web.Modules;
 
     #endregion
@@ -111,6 +112,8 @@
             this.Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
 
             this.Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));
+
+            this.Bind<PackageServiceStreamProvider>().To<PackageServiceStreamProviderExt>();
 
             this.LoadAuthentication();
 

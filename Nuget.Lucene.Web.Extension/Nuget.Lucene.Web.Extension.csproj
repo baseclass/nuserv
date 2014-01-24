@@ -92,12 +92,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NuGet.Core.2.7.2\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Lucene">
-      <HintPath>..\packages\NuGet.Lucene.2.1.0\lib\net451\NuGet.Lucene.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Lucene.Web, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Lucene, Version=2.3.0.31, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NuGet.Lucene.Web.2.2.2-nuserv\lib\net451\NuGet.Lucene.Web.dll</HintPath>
+      <HintPath>..\packages\NuGet.Lucene.2.3.0\lib\net451\NuGet.Lucene.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Lucene.Web, Version=2.3.0.31, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NuGet.Lucene.Web.2.3.0\lib\net451\NuGet.Lucene.Web.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -179,6 +180,7 @@
     <Compile Include="DynamicServiceRoute.cs" />
     <Compile Include="NuGetMultiRepositoryWebApiModule.cs" />
     <Compile Include="NuGetMultiRepositoryWebApiRouteMapper.cs" />
+    <Compile Include="PackageServiceStreamProviderExt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
