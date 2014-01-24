@@ -1,9 +1,40 @@
-﻿angular.module('repositoryApp.controllers', [
-        function() {
-        }
-    ])
-    .controller('RepositoryController', [
-        '$scope', '$http', function($scope, $http) {
+﻿var app = angular.module('repositoryApp.controllers', [
+    function() {
+    }
+]);
+
+app.factory('repositoryListViewModelFactory', ['$rootScope', function($rootScope) {
+
+    var repository = function (atts) {
+            var childScope = $rootScope.$new(true);
+
+            childScope.repository = {};
+
+            var self = childScope.repository;
+
+            var initialSettings = atts || {};
+            //initial settings if passed in
+            for (var setting in initialSettings) {
+                if (initialSettings.hasOwnProperty(setting))
+                    self[setting] = initialSettings[setting];
+            };
+
+            if (self.isNew) {
+                childScope.$watch('repository.Name', function () {
+                    childScope.repository.Id = childScope.repository.Name.replace(/[^A-Za-z0-9\/]/g, "-").replace(/^\/+|\/+$/g, '').toLowerCase();
+                });
+            }
+
+            return self;
+        };
+
+    return {
+        create: repository
+    };
+}]);
+
+app.controller('RepositoriesController', [
+        '$scope', '$http', 'repositoryListViewModelFactory', function ($scope, $http, repositoryListViewModelFactory) {
             //We define the model
             $scope.model = {};
 
@@ -14,10 +45,18 @@
             $scope.model.repositoryRows = [];
 
             $scope.$watch('model.repositories', function () {
-                var reps = $scope.model.repositories.slice(0);
+                var reps = []; //$scope.model.repositories.slice(0);
+
+                angular.forEach($scope.model.repositories, function(repository) {
+                    var repositoryListViewModel = repositoryListViewModelFactory.create(repository);
+
+                    repositoryListViewModel.isNew = false;
+
+                    reps.push(repositoryListViewModel);
+                });
 
                 //Add new repository
-                reps.push({ Name: '', Description: '', isNew : true });
+                reps.push(repositoryListViewModelFactory.create({ Id: '', Name: '', Description: '', isNew: true }));
 
                 var result = [];
                 for (var i = 0; i < reps.length; i += 4) {
@@ -69,9 +108,6 @@
             $scope.save = function (repository) {
                 repository.errorName = '';
                 repository.errorDescription = '';
-
-                //Replace spaces in name
-                repository.Name = repository.Name.replace(/\s/g, "");
 
                 if (repository.Name.length < 3) {
                     repository.errorName = "Name is to short";

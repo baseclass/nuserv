@@ -2,7 +2,7 @@
 .config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/repository', {
         templateUrl: '/app/repository/repositories.html',
-        controller: 'RepositoryController'
+        controller: 'RepositoriesController'
     });
 
     $routeProvider.otherwise({ redirectTo: '/repository' });

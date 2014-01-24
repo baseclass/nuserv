@@ -10,6 +10,7 @@
         <div class="col-md-3" ng-repeat="repository in row">
             <div ng-show="!repository.isNew">
                 <h3><i class="fa fa-archive fa-align-left"></i> <span>{{ repository.Name }}</span></h3>
+                <h6>url: {{ repository.Id }}</h6>
                 <p>
                     <span>{{ repository.Description }}</span>
                 </p>
@@ -18,6 +19,10 @@
                 <h3 class="form-group" ng-class="{'has-error': repository.errorName.length > 0}">
                     <input class="form-control" type="text" ng-model="repository.Name" id="name" placeholder="Repository name" />
                     <label for="name" class="help-block" ng-show="repository.errorName.length > 0"> {{ repository.errorName }} </label>
+                </h3>
+                <h3 class="form-group" ng-class="{'has-error': repository.errorId.length > 0}">
+                    <input class="form-control" type="text" ng-model="repository.Id" id="id" placeholder="Url" />
+                    <label for="id" class="help-block" ng-show="repository.errorId.length > 0"> {{ repository.errorId }} </label>
                 </h3>
                 <p class="form-group" ng-class="{'has-error': repository.errorDescription.length }">
                     <textarea class=" form-control" ng-model="repository.Description" id="description" placeholder="Description" rows="11">
