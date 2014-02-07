@@ -21,7 +21,7 @@ app.factory('repositoryListViewModelFactory', ['$rootScope', function($rootScope
 
             if (self.isNew) {
                 childScope.$watch('repository.Name', function () {
-                    childScope.repository.Id = childScope.repository.Name.replace(/[^A-Za-z0-9\/]/g, '-').replace(/\/{2,}/, '/').replace(/^\/+|\/+$/g, '').toLowerCase();
+                    childScope.repository.Id = childScope.repository.Name.replace(/[^A-Za-z0-9]/g, '-').toLowerCase();
                 });
             }
 
