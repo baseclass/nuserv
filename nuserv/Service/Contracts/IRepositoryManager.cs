@@ -11,5 +11,7 @@
         IRepository GetById(string id);
 
         void Add(IRepository repository);
+
+        bool Exists(string id);
     }
 }

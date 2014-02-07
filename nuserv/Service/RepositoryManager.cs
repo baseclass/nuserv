@@ -48,6 +48,11 @@ namespace nuserv.Service
             }
         }
 
+        public bool Exists(string id)
+        {
+            return this.repository.AsQueryable().Any(r => r.Id == id);
+        }
+
         public IEnumerable<IRepository> GetAll()
         {
             return this.repository.AsQueryable();
