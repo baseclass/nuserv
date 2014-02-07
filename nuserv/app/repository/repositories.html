@@ -10,7 +10,8 @@
         <div class="col-md-3" ng-repeat="repository in row">
             <div ng-show="!repository.isNew">
                 <h3><i class="fa fa-archive fa-align-left"></i> <span>{{ repository.Name }}</span></h3>
-                <h6>url: {{ repository.Id }}</h6>
+                <h6>api url: repository/{{ repository.Id }}</h6>
+                <h6>feed url: repository/{{ repository.Id }}/api/v2</h6>
                 <p>
                     <span>{{ repository.Description }}</span>
                 </p>
