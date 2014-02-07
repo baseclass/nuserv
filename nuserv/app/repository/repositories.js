@@ -38,14 +38,12 @@ app.controller('RepositoriesController', [
             //We define the model
             $scope.model = {};
 
-            //We define the allMessages array in the model 
-            //that will contain all the messages sent so far
             $scope.model.repositories = [];
 
             $scope.model.repositoryRows = [];
 
             $scope.$watch('model.repositories', function () {
-                var reps = []; //$scope.model.repositories.slice(0);
+                var reps = [];
 
                 angular.forEach($scope.model.repositories, function(repository) {
                     var repositoryListViewModel = repositoryListViewModelFactory.create(repository);
@@ -109,37 +107,42 @@ app.controller('RepositoriesController', [
                 repository.errorName = '';
                 repository.errorDescription = '';
 
+                var failed = false;
+
                 if (repository.Name.length < 3) {
                     repository.errorName = "Name is to short";
+                    failed = true;
                 }
 
                 if (repository.Description.length < 1) {
                     repository.errorDescription = "Description is to short";
+                    failed = true;
                 }
 
-                $http({
-                    url: '/api/repository',
-                    method: "POST",
-                    data: repository
-                }).success(function (data, status, headers, config) {
-                    repository.isNew = false;
-                }).error(function (data, status, headers, config) {
-                    $scope.errorName = status;
-                });
-                
-            };
+                if (!failed) {
+                    $http({
+                        url: '/api/repository',
+                        method: "POST",
+                        data: repository
+                    }).success(function (data, status, headers, config) {
+                        repository.isNew = false;
 
-        $scope.delete = function(repository) {
-            $http({
-                url: '/api/repository',
-                method: "DELETE",
-                data: repository.Id
-            }).success(function (data, status, headers, config) {
-                var index = $scope.model.repositories.indexOf(repository);
-                repository.splice(index, 1);
-            }).error(function (data, status, headers, config) {
-                $scope.errorName = status;
-            });
-        };
+                        var rowCount = $scope.model.repositoryRows.length;
+
+                        var row = $scope.model.repositoryRows[rowCount - 1];
+
+                        if (row.length == 4) {
+                            row = [];
+                            $scope.model.repositoryRows.push(row);
+                        }
+
+                        //Add new repository
+                        row.push(repositoryListViewModelFactory.create({ Id: '', Name: '', Description: '', isNew: true }));
+
+                    }).error(function (data, status, headers, config) {
+                        repository.errorName = data.ExceptionMessage;
+                    });
+                }
+            };
     }
     ]);
