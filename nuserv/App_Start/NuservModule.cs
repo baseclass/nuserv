@@ -43,9 +43,6 @@
 
         private static void Initialize(IResolutionRoot resolutionRoot)
         {
-            var repositoryKernelService = resolutionRoot.Get<IRepositoryKernelService>();
-            repositoryKernelService.Init();
-
             var routeMapper = resolutionRoot.Get<NuGetMultiRepositoryWebApiRouteMapper>();
 
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);

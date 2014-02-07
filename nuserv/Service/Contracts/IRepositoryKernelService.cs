@@ -12,8 +12,6 @@
 
         IResolutionRoot GetChildKernel(string name);
 
-        void Init();
-
         bool RepositoryExists(string name);
 
         #endregion

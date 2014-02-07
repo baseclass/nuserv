@@ -9,6 +9,7 @@
 
     using Lucene.Net.Linq;
 
+    using Ninject.Extensions.ChildKernel;
     using Ninject.Syntax;
 
     using NuGet.Lucene;
@@ -30,20 +31,32 @@
 
         #region Fields
 
+        private readonly object childKernelCreationLock = new object();
+
         private readonly IChildKernelFactory childKernelFactory;
 
         private readonly IDictionary<string, IResolutionRoot> repositoryDictionary;
 
+        private readonly IRepositoryManager repositoryManager;
+
         private readonly IResolutionRoot resolutionRoot;
+
+        private readonly ReusableCancellationTokenSource reusableCancellationTokenSource;
 
         #endregion
 
         #region Constructors and Destructors
 
-        public RepositoryKernelService(IResolutionRoot resolutionRoot, IChildKernelFactory childKernelFactory)
+        public RepositoryKernelService(
+            IRepositoryManager repositoryManager,
+            IResolutionRoot resolutionRoot,
+            IChildKernelFactory childKernelFactory,
+            ReusableCancellationTokenSource reusableCancellationTokenSource)
         {
+            this.repositoryManager = repositoryManager;
             this.resolutionRoot = resolutionRoot;
             this.childKernelFactory = childKernelFactory;
+            this.reusableCancellationTokenSource = reusableCancellationTokenSource;
             this.repositoryDictionary = new Dictionary<string, IResolutionRoot>();
         }
 
@@ -71,21 +84,39 @@
 
         #endregion
 
-        #region Properties
-
-        [Ninject.Inject]
-        private ReusableCancellationTokenSource TokenSource { get; set; }
-
-        #endregion
-
         #region Public Methods and Operators
 
         public IResolutionRoot GetChildKernel(string name)
         {
+            if (!this.RepositoryExists(name))
+            {
+                throw new ArgumentException(string.Format("Repository {0} not found", name), "name");
+            }
+
+            if (!this.repositoryDictionary.ContainsKey(name))
+            {
+                lock (this.childKernelCreationLock)
+                {
+                    if (!this.repositoryDictionary.ContainsKey(name))
+                    {
+                        this.repositoryDictionary.Add(name, this.CreateKernel(name));
+                    }
+                }
+            }
+
             return this.repositoryDictionary[name];
         }
 
-        public void Init()
+        public bool RepositoryExists(string name)
+        {
+            return this.repositoryManager.Exists(name);
+        }
+
+        #endregion
+
+        #region Methods
+
+        private static LuceneRepositoryConfigurator CreateLuceneRepositoryConfigurator(string name)
         {
             var cfg = new LuceneRepositoryConfigurator
                       {
@@ -96,72 +127,16 @@
                           LuceneIndexPath =
                               MapPathFromAppSetting(
                                   "lucenePath",
-                                  "~/App_Data/repo1/Lucene"),
+                                  string.Format("~/App_Data/{0}/Lucene", name)),
                           PackagePath =
                               MapPathFromAppSetting(
                                   "packagesPath",
-                                  "~/App_Data/repo1/Packages")
+                                  string.Format("~/App_Data/{0}/Packages", name))
                       };
 
-            var cfg2 = new LuceneRepositoryConfigurator
-                       {
-                           EnablePackageFileWatcher =
-                               GetFlagFromAppSetting("enablePackageFileWatcher", true),
-                           GroupPackageFilesById =
-                               GetFlagFromAppSetting("groupPackageFilesById", true),
-                           LuceneIndexPath =
-                               MapPathFromAppSetting(
-                                   "lucenePath",
-                                   "~/App_Data/repo2/Lucene"),
-                           PackagePath =
-                               MapPathFromAppSetting(
-                                   "packagesPath",
-                                   "~/App_Data/repo2/Packages")
-                       };
-
             cfg.Initialize();
-
-            cfg2.Initialize();
-
-            var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(
-                cfg.Repository,
-                PackageMirrorTargetUrl,
-                PackageMirrorTimeout);
-            var mirroringPackageRepository2 = MirroringPackageRepositoryFactory.Create(
-                cfg2.Repository,
-                PackageMirrorTargetUrl,
-                PackageMirrorTimeout);
-
-            var repo1Kernel = this.childKernelFactory.Create(this.resolutionRoot);
-
-            repo1Kernel.Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).OnDeactivation(_ => cfg.Dispose());
-            repo1Kernel.Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository);
-            repo1Kernel.Bind<LuceneDataProvider>().ToConstant(cfg.Provider);
-
-            var repo2Kernel = this.childKernelFactory.Create(this.resolutionRoot);
-
-            repo2Kernel.Bind<ILucenePackageRepository>().ToConstant(cfg2.Repository).OnDeactivation(_ => cfg.Dispose());
-            repo2Kernel.Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository2);
-            repo2Kernel.Bind<LuceneDataProvider>().ToConstant(cfg2.Provider);
-
-            this.repositoryDictionary.Add("repo1", repo1Kernel);
-            this.repositoryDictionary.Add("repo2", repo2Kernel);
-
-            if (GetFlagFromAppSetting("synchronizeOnStart", true))
-            {
-                cfg.Repository.SynchronizeWithFileSystem(this.TokenSource.Token);
-                cfg2.Repository.SynchronizeWithFileSystem(this.TokenSource.Token);
-            }
+            return cfg;
         }
-
-        public bool RepositoryExists(string name)
-        {
-            return name == "repo1" || name == "repo2";
-        }
-
-        #endregion
-
-        #region Methods
 
         private static string GetAppSetting(string key, string defaultValue)
         {
@@ -192,6 +167,28 @@
             }
 
             return path;
+        }
+
+        private IChildKernel CreateKernel(string name)
+        {
+            var cfg = CreateLuceneRepositoryConfigurator(name);
+
+            var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(
+                cfg.Repository,
+                PackageMirrorTargetUrl,
+                PackageMirrorTimeout);
+
+            var kernel = this.childKernelFactory.Create(this.resolutionRoot);
+
+            kernel.Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).OnDeactivation(_ => cfg.Dispose());
+            kernel.Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository);
+            kernel.Bind<LuceneDataProvider>().ToConstant(cfg.Provider);
+
+            if (GetFlagFromAppSetting("synchronizeOnStart", true))
+            {
+                cfg.Repository.SynchronizeWithFileSystem(this.reusableCancellationTokenSource.Token);
+            }
+            return kernel;
         }
 
         #endregion

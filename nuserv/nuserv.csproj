@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\packages\JetBrains.Annotations.Redist.7.1\lib\net40\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net">
       <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
     </Reference>
@@ -631,10 +634,6 @@
     <Content Include="Views\Repository\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\repo1\Lucene\" />
-    <Folder Include="App_Data\repo1\Packages\" />
-    <Folder Include="App_Data\repo2\Lucene\" />
-    <Folder Include="App_Data\repo2\Packages\" />
     <Folder Include="App_Data\Users\" />
   </ItemGroup>
   <ItemGroup>
