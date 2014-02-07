@@ -35,7 +35,7 @@
             config.Services.Replace(typeof(IDocumentationProvider), new WebApiHtmlDocumentationProvider(documentation));
 
             // register the formatter
-            // config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
+            config.Formatters.Add(new NuGetHtmlMicrodataFormatter());
         }
 
         #endregion
