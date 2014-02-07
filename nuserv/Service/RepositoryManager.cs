@@ -1,35 +1,63 @@
 namespace nuserv.Service
 {
-    using System.Collections.Generic;
+    #region Usings
 
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using nuserv.Models;
     using nuserv.Models.Contracts;
     using nuserv.Service.Contracts;
 
+    #endregion
+
     public class RepositoryManager : IRepositoryManager
     {
-        private readonly IRepositoryFactory repositoryFactory;
+        #region Fields
 
-        public RepositoryManager(IRepositoryFactory repositoryFactory)
+        private readonly IRepositoryRepository repository;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public RepositoryManager(IRepositoryRepository repository)
         {
-            this.repositoryFactory = repositoryFactory;
+            this.repository = repository;
         }
 
-        public void Init()
+        #endregion
+
+        #region Public Methods and Operators
+
+        public void Add(IRepository repository)
         {
+            var repo = repository as Repository;
+
+            if (repo == null)
+            {
+                throw new ArgumentException("Invalid repository", "repository");
+            }
+
+            using (var session = this.repository.OpenSession())
+            {
+                session.Add(repo);
+
+                session.Commit();
+            }
         }
 
         public IEnumerable<IRepository> GetAll()
         {
-            yield return this.repositoryFactory.Create("test", "test", "test");
+            return this.repository.AsQueryable();
         }
 
         public IRepository GetById(string id)
         {
-            return this.repositoryFactory.Create(id, "test", "test");
+            return this.repository.AsQueryable().Where(r => r.Id == id).Cast<IRepository>().Single();
         }
 
-        public void Add(IRepository repository)
-        {
-        }
+        #endregion
     }
 }

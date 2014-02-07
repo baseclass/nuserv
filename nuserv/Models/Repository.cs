@@ -10,6 +10,10 @@
     {
         #region Constructors and Destructors
 
+        public Repository()
+        {
+        }
+
         public Repository(string id, string name, string description)
             : base(id)
         {
@@ -21,9 +25,9 @@
 
         #region Public Properties
 
-        public string Description { get; private set; }
+        public string Description { get; set; }
 
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         #endregion
     }

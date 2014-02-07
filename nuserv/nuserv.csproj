@@ -276,8 +276,10 @@
     <Compile Include="Models\Repository.cs" />
     <Compile Include="Service\Contracts\IRepositoryKernelService.cs" />
     <Compile Include="Service\Contracts\IRepositoryManager.cs" />
+    <Compile Include="Service\Contracts\IRepositoryRepository.cs" />
     <Compile Include="Service\Contracts\IResolutionRootResolver.cs" />
     <Compile Include="Service\RepositoryManager.cs" />
+    <Compile Include="Service\RepositoryRepository.cs" />
     <Compile Include="WebApi\Controllers\RepositoryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

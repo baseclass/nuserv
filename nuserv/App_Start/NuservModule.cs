@@ -46,9 +46,6 @@
             var repositoryKernelService = resolutionRoot.Get<IRepositoryKernelService>();
             repositoryKernelService.Init();
 
-            var repositoryManager = resolutionRoot.Get<IRepositoryManager>();
-            repositoryManager.Init();
-
             var routeMapper = resolutionRoot.Get<NuGetMultiRepositoryWebApiRouteMapper>();
 
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
@@ -62,6 +59,7 @@
             bindingRoot.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
             bindingRoot.Bind<IHttpRouteDataResolver>().To<HttpRouteDataResolver>().InSingletonScope();
             bindingRoot.Bind<IRepositoryManager>().To<RepositoryManager>().InSingletonScope();
+            bindingRoot.Bind<IRepositoryRepository>().To<RepositoryRepository>();
 
             bindingRoot.Bind<IRepository>().To<Repository>();
             bindingRoot.Bind<IRepositoryFactory>().ToFactory().InSingletonScope();

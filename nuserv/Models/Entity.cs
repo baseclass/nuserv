@@ -6,6 +6,10 @@
     {
         #region Constructors and Destructors
 
+        protected Entity()
+        {
+        }
+
         protected Entity(TId id)
         {
             this.Id = id;
@@ -15,7 +19,7 @@
 
         #region Public Properties
 
-        public TId Id { get; private set; }
+        public TId Id { get; set; }
 
         #endregion
     }

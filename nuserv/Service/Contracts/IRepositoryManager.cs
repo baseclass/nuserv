@@ -6,8 +6,6 @@
 
     public interface IRepositoryManager
     {
-        void Init();
-
         IEnumerable<IRepository> GetAll();
 
         IRepository GetById(string id);
