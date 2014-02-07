@@ -21,7 +21,7 @@
                     <label for="name" class="help-block" ng-show="repository.errorName.length > 0"> {{ repository.errorName }} </label>
                 </h3>
                 <h3 class="form-group" ng-class="{'has-error': repository.errorId.length > 0}">
-                    <input class="form-control" type="text" ng-model="repository.Id" id="id" placeholder="Url" />
+                    <input class="form-control" type="text" ng-readonly="true" ng-model="repository.Id" id="id" placeholder="Url" />
                     <label for="id" class="help-block" ng-show="repository.errorId.length > 0"> {{ repository.errorId }} </label>
                 </h3>
                 <p class="form-group" ng-class="{'has-error': repository.errorDescription.length }">

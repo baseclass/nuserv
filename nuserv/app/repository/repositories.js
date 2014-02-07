@@ -21,7 +21,7 @@ app.factory('repositoryListViewModelFactory', ['$rootScope', function($rootScope
 
             if (self.isNew) {
                 childScope.$watch('repository.Name', function () {
-                    childScope.repository.Id = childScope.repository.Name.replace(/[^A-Za-z0-9\/]/g, "-").replace(/^\/+|\/+$/g, '').toLowerCase();
+                    childScope.repository.Id = childScope.repository.Name.replace(/[^A-Za-z0-9\/]/g, '-').replace(/\/{2,}/, '/').replace(/^\/+|\/+$/g, '').toLowerCase();
                 });
             }
 
@@ -122,11 +122,24 @@ app.controller('RepositoriesController', [
                     method: "POST",
                     data: repository
                 }).success(function (data, status, headers, config) {
-                    alert('yuhuu!');
+                    repository.isNew = false;
                 }).error(function (data, status, headers, config) {
                     $scope.errorName = status;
                 });
                 
             };
+
+        $scope.delete = function(repository) {
+            $http({
+                url: '/api/repository',
+                method: "DELETE",
+                data: repository.Id
+            }).success(function (data, status, headers, config) {
+                var index = $scope.model.repositories.indexOf(repository);
+                repository.splice(index, 1);
+            }).error(function (data, status, headers, config) {
+                $scope.errorName = status;
+            });
+        };
     }
     ]);
