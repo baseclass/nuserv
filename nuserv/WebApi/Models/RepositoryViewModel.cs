@@ -1,6 +1,6 @@
 ﻿namespace nuserv.WebApi.Models
 {
-    public class Repository : Entity<string>
+    public class RepositoryViewModel : EntityViewModel<string>
     {
         public string Name { get; set; }
 

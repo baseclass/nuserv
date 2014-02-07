@@ -3,12 +3,12 @@
     #region Usings
 
     using System;
-    using System.ServiceModel.Dispatcher;
     using System.Web.Http;
     using System.Web.Http.Dependencies;
     using System.Web.Routing;
 
     using Ninject;
+    using Ninject.Extensions.Factory;
     using Ninject.Modules;
     using Ninject.Parameters;
     using Ninject.Syntax;
@@ -16,8 +16,13 @@
 
     using NuGet.Lucene.Web.Extension;
 
+    using nuserv.Models;
+    using nuserv.Models.Contracts;
     using nuserv.Service;
+    using nuserv.Service.Contracts;
     using nuserv.Utility;
+
+    using IInstanceProvider = System.ServiceModel.Dispatcher.IInstanceProvider;
 
     #endregion
 
@@ -41,6 +46,9 @@
             var repositoryKernelService = resolutionRoot.Get<IRepositoryKernelService>();
             repositoryKernelService.Init();
 
+            var repositoryManager = resolutionRoot.Get<IRepositoryManager>();
+            repositoryManager.Init();
+
             var routeMapper = resolutionRoot.Get<NuGetMultiRepositoryWebApiRouteMapper>();
 
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
@@ -53,6 +61,10 @@
             bindingRoot.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
             bindingRoot.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
             bindingRoot.Bind<IHttpRouteDataResolver>().To<HttpRouteDataResolver>().InSingletonScope();
+            bindingRoot.Bind<IRepositoryManager>().To<RepositoryManager>().InSingletonScope();
+
+            bindingRoot.Bind<IRepository>().To<Repository>();
+            bindingRoot.Bind<IRepositoryFactory>().ToFactory().InSingletonScope();
 
             // Remove default ninject dependency resolver and bind to one which creates a child kernel per request
             // and uses an IResolutionRootResolver to get the resolution root to create a child kernel from.

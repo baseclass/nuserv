@@ -1,6 +1,6 @@
 ﻿namespace nuserv.WebApi.Models
 {
-    public abstract class Entity<TId>
+    public abstract class EntityViewModel<TId>
     {
         #region Public Properties
 

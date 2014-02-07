@@ -5,6 +5,7 @@
     using System.Web.Http.Dependencies;
 
     using nuserv.Service;
+    using nuserv.Service.Contracts;
 
     #endregion
 

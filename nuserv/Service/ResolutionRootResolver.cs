@@ -6,6 +6,7 @@
 
     using Ninject.Syntax;
 
+    using nuserv.Service.Contracts;
     using nuserv.Utility;
 
     #endregion

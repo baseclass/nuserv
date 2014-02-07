@@ -1,4 +1,4 @@
-﻿namespace nuserv.Service
+﻿namespace nuserv.Service.Contracts
 {
     #region Usings
 

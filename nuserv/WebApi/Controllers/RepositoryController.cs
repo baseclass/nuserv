@@ -2,51 +2,99 @@
 {
     #region Usings
 
-    using nuserv.WebApi.Models;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Web.Http;
+
+    using nuserv.Models.Contracts;
+    using nuserv.Service.Contracts;
+    using nuserv.WebApi.Models;
 
     #endregion
 
     public class RepositoryController : ApiController
     {
-        // GET api/<controller>
+        #region Fields
+
+        private readonly IRepositoryFactory repositoryFactory;
+
+        private readonly IRepositoryManager repositoryManager;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public RepositoryController(IRepositoryManager repositoryManager, IRepositoryFactory repositoryFactory)
+        {
+            this.repositoryManager = repositoryManager;
+            this.repositoryFactory = repositoryFactory;
+        }
+
+        #endregion
 
         #region Public Methods and Operators
 
+        /// <remarks>
+        ///     DELETE api/controller/5
+        /// </remarks>
         public void Delete(int id)
         {
         }
 
-        private const string Lorem = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-
-        public IEnumerable<Repository> Get()
+        /// <remarks>
+        ///     GET api/controller
+        /// </remarks>
+        public IEnumerable<RepositoryViewModel> Get()
         {
-            yield return new Repository() { Id = "ext-curated1", Name = @"External\Curated Feed 1", Description = Lorem };
-            yield return new Repository() { Id = "ext-curated2", Name = @"External\Curated Feed 2", Description = Lorem };
-            yield return new Repository() { Id = "development", Name = @"Development", Description = Lorem };
-            yield return new Repository() { Id = "integration", Name = @"Integration", Description = Lorem };
-            yield return new Repository() { Id = "production", Name = @"Production", Description = Lorem };
+            return
+                this.repositoryManager.GetAll()
+                    .Select(
+                        repository =>
+                            new RepositoryViewModel()
+                            {
+                                Id = repository.Id,
+                                Name = repository.Name,
+                                Description = repository.Description
+                            });
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
+        /// <remarks>
+        ///     GET api/controller/5
+        /// </remarks>
+        public RepositoryViewModel Get(string id)
         {
-            return "value";
+            var repository = this.repositoryManager.GetById(id);
+
+            var repositoryViewModel = new RepositoryViewModel()
+                                      {
+                                          Id = repository.Id,
+                                          Name = repository.Name,
+                                          Description = repository.Description
+                                      };
+
+            return repositoryViewModel;
         }
 
-        // POST api/<controller>
-        public void Post([FromBody] Repository repository)
+        /// <remarks>
+        ///     POST api/controller
+        /// </remarks>
+        public void Post([FromBody] RepositoryViewModel repositoryViewModel)
         {
+            var repository = this.repositoryFactory.Create(
+                repositoryViewModel.Id,
+                repositoryViewModel.Name,
+                repositoryViewModel.Description);
+
+            this.repositoryManager.Add(repository);
         }
 
-        // PUT api/<controller>/5
+        /// <remarks>
+        ///     PUT api/controller/5
+        /// </remarks>
         public void Put(int id, [FromBody] string value)
         {
         }
 
         #endregion
-
-        // DELETE api/<controller>/5
     }
 }

@@ -15,6 +15,7 @@
     using NuGet.Lucene.Web;
     using NuGet.Lucene.Web.Models;
 
+    using nuserv.Service.Contracts;
     using nuserv.Utility;
 
     #endregion
