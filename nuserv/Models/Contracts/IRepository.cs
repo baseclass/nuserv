@@ -2,8 +2,12 @@ namespace nuserv.Models.Contracts
 {
     public interface IRepository : IEntity<string>
     {
-        string Name { get; }
+        #region Public Properties
 
         string Description { get; }
+
+        string Name { get; }
+
+        #endregion
     }
 }

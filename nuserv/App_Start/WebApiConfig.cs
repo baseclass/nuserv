@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
-
-namespace nuserv
+﻿namespace nuserv
 {
+    #region Usings
+
+    using System.Web.Http;
+
+    #endregion
+
     public static class WebApiConfig
     {
+        #region Public Methods and Operators
+
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
@@ -17,8 +20,9 @@ namespace nuserv
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/repository/{id}",
-                defaults: new { controller = "Repository",  id = RouteParameter.Optional }
-            );
+                defaults: new { controller = "Repository", id = RouteParameter.Optional });
         }
+
+        #endregion
     }
 }

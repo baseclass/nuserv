@@ -2,8 +2,12 @@
 {
     public class RepositoryViewModel : EntityViewModel<string>
     {
-        public string Name { get; set; }
+        #region Public Properties
 
         public string Description { get; set; }
+
+        public string Name { get; set; }
+
+        #endregion
     }
 }

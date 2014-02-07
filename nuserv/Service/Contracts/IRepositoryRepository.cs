@@ -7,7 +7,6 @@
     using Lucene.Net.Linq;
 
     using nuserv.Models;
-    using nuserv.Models.Contracts;
 
     #endregion
 
@@ -15,9 +14,9 @@
     {
         #region Public Methods and Operators
 
-        ISession<Repository> OpenSession();
-
         IQueryable<Repository> AsQueryable();
+
+        ISession<Repository> OpenSession();
 
         #endregion
     }

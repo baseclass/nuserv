@@ -1,6 +1,10 @@
 ﻿namespace nuserv.Models
 {
+    #region Usings
+
     using nuserv.Models.Contracts;
+
+    #endregion
 
     public abstract class Entity<TId> : IEntity<TId>
     {

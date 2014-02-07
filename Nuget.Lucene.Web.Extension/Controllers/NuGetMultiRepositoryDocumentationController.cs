@@ -5,7 +5,6 @@
     using AspNet.WebApi.HtmlMicrodataFormatter;
 
     using NuGet.Lucene.Web.DataServices;
-    using NuGet.Lucene.Web.Hubs;
 
     #endregion
 
@@ -46,7 +45,7 @@
                         PackageDataService
                         ))
                 });
-            
+
             return docs;
         }
 
