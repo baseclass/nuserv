@@ -40,6 +40,11 @@ namespace nuserv.Service
                 throw new ArgumentException("Invalid repository", "repository");
             }
 
+            if (this.Exists(repository.Id))
+            {
+                throw new Exception("Already exists");
+            }
+
             using (var session = this.repository.OpenSession())
             {
                 session.Add(repo);
