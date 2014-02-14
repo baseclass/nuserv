@@ -29,21 +29,21 @@ namespace nuserv.UiTests.Repository
         {
             var repositories = Wait.Until(d => d.FindElements(By.ClassName("repository")));
 
-            Assert.AreEqual(p0, repositories.Count(r => r.Displayed), "Number of repositories wrong");
+            Assert.AreEqual(p0, repositories.Count(r => !r.GetAttribute("class").Contains("ng-hide")), "Number of repositories wrong");
         }
 
         [Then(@"I should see a form to create a new repository")]
         public void ThenIShouldSeeAFormToCreateANewRepository()
         {
-            var newRepositories = Wait.Until(d => d.FindElements(By.ClassName("newRepository")));
+            var newRepositories = Wait.Until(d => d.FindElements(By.ClassName("newRepository")).Where(r => !r.GetAttribute("class").Contains("ng-hide")));
 
-            Assert.AreEqual(1, newRepositories.Count(r => r.Displayed), "New repository creation form not found!");
+            Assert.AreEqual(1, newRepositories.Count(r => !r.GetAttribute("class").Contains("ng-hide")), "New repository creation form not found!");
         }
 
         [Then(@"I should see the following repositories:")]
         public void ThenIShouldSeeTheFollowingRepositories(Table table)
         {
-            var repositories = Wait.Until(d => d.FindElements(By.ClassName("repository")).Where(r => r.Displayed)).ToArray();
+            var repositories = Wait.Until(d => d.FindElements(By.ClassName("repository")).Where(r => !r.GetAttribute("class").Contains("ng-hide"))).ToArray();
 
             Assert.AreEqual(repositories.Count(), table.RowCount, "Number of repositories wrong");
 

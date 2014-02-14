@@ -33,7 +33,7 @@ namespace nuserv.UiTests.Repository
         [Given(@"I have entered the following information:")]
         public void GivenIHaveEnteredTheFollowingInformation(Table table)
         {
-            var newRepository = Wait.Until(d => d.FindElements(By.ClassName("newRepository"))).FirstOrDefault(r => r.Displayed);
+            var newRepository = GetNewRepository();
 
             if (newRepository == null)
             {
@@ -64,7 +64,9 @@ namespace nuserv.UiTests.Repository
         [When(@"I press Save")]
         public void WhenIPressSave()
         {
-           var saveButton = Browser.Current.FindElements(By.Id("saveNewRepository")).FirstOrDefault(r => r.Displayed);
+           var newRepository = GetNewRepository();
+
+           var saveButton = newRepository.FindElements(By.Id("saveNewRepository")).FirstOrDefault();
 
            Assert.IsNotNull(saveButton, "Can't find save button!");
 
@@ -82,7 +84,9 @@ namespace nuserv.UiTests.Repository
             row["ApiUrl"] = string.Format(row["ApiUrl"], ScenarioContext.Current["uniqueness"]);
             row["FeedUrl"] = string.Format(row["FeedUrl"], ScenarioContext.Current["uniqueness"]);
 
-            var repository = Wait.Until(d => d.FindElements(By.Id(row["Title"])).Where(r => r.Displayed)).LastOrDefault();
+            var newRepository = GetNewRepository();
+
+            var repository = newRepository.FindElements(By.Id(row["Title"])).LastOrDefault();
 
             Assert.IsNotNull(repository, "Repository not found!");
 
@@ -92,7 +96,7 @@ namespace nuserv.UiTests.Repository
         [Then(@"I should see the error ""(.*)"" on (.*)")]
         public void ThenIShouldSeeTheErrorOn(string error, string name)
         {
-            var newRepository = Browser.Current.FindElements(By.ClassName("newRepository")).FirstOrDefault(r => r.Displayed);
+            var newRepository = GetNewRepository();
 
             var labels = newRepository.FindElements(By.TagName("label"));
 
@@ -106,13 +110,22 @@ namespace nuserv.UiTests.Repository
         [Then(@"I should see the url ""(.*)""")]
         public void ThenIShouldSeeTheUrl(string url)
         {
-            var newRepository = Browser.Current.FindElements(By.ClassName("newRepository")).FirstOrDefault(r => r.Displayed);
+            var newRepository = GetNewRepository();
 
             var urlInputField = newRepository.FindElement(By.Id("id"));
 
             Assert.IsNotNull(urlInputField, "Url input field not found!");
 
             Assert.AreEqual(url, urlInputField.GetAttribute("value"));
+        }
+
+        private IWebElement GetNewRepository()
+        {
+            var newRepository = Wait.Until(d => d.FindElements(By.ClassName("newRepository")).FirstOrDefault(r => !r.GetAttribute("class").Contains("ng-hide")));
+
+            Assert.NotNull(newRepository, "Can't find new repository form!");
+
+            return newRepository;
         }
     }
 }
