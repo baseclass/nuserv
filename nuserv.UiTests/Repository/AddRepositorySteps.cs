@@ -5,6 +5,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Linq;
+using System.Threading;
 using TechTalk.SpecFlow;
 
 namespace nuserv.UiTests.Repository
@@ -70,7 +71,13 @@ namespace nuserv.UiTests.Repository
 
            Assert.IsNotNull(saveButton, "Can't find save button!");
 
+           ((IJavaScriptExecutor)Browser.Current).ExecuteScript("arguments[0].scrollIntoView(true);", saveButton);
+           
+           Thread.Sleep(500);
+
            saveButton.Click();
+
+           Thread.Sleep(500);
 
            ResetWait();
         }
