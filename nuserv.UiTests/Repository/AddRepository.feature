@@ -33,7 +33,7 @@ Scenario Outline: Automatic url generation
 	And I have entered the following information:
 		| Title   | Description |
 		| <Title> |             |
-	Then I should see the url "<Expected Url>"
+	Then I should see the url "<Expected Url>" 
 	Scenarios: 
 		| Title          | Expected Url   |
 		| New Rep0sitory | new-rep0sitory |

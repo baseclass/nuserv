@@ -1,4 +1,5 @@
-﻿using Baseclass.Contrib.SpecFlow.Selenium.NUnit.Bindings;
+﻿using Baseclass.Contrib.SpecFlow.Selenium.NUnit;
+using Baseclass.Contrib.SpecFlow.Selenium.NUnit.Bindings;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -36,14 +37,14 @@ namespace nuserv.UiTests.Repository
 
             if (newRepository == null)
             {
-                Assert.Inconclusive("New repositry form not found!");
+                Assert.Inconclusive("New repository form not found!");
             }
 
             var row = table.Rows[0];
 
             var uniqueness = Guid.NewGuid().ToString().Replace("{", string.Empty).Replace("}", string.Empty);
 
-            FeatureContext.Current["uniqueness"] = uniqueness;
+            ScenarioContext.Current["uniqueness"] = uniqueness;
 
             var title = string.Format(row["Title"], uniqueness);
 
@@ -77,9 +78,9 @@ namespace nuserv.UiTests.Repository
         {
             var row = table.Rows[0];
 
-            row["Title"] = string.Format(row["Title"], FeatureContext.Current["uniqueness"]);
-            row["ApiUrl"] = string.Format(row["ApiUrl"], FeatureContext.Current["uniqueness"]);
-            row["FeedUrl"] = string.Format(row["FeedUrl"], FeatureContext.Current["uniqueness"]);
+            row["Title"] = string.Format(row["Title"], ScenarioContext.Current["uniqueness"]);
+            row["ApiUrl"] = string.Format(row["ApiUrl"], ScenarioContext.Current["uniqueness"]);
+            row["FeedUrl"] = string.Format(row["FeedUrl"], ScenarioContext.Current["uniqueness"]);
 
             var repository = Wait.Until(d => d.FindElements(By.Id(row["Title"])).Where(r => r.Displayed)).LastOrDefault();
 

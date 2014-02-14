@@ -41,8 +41,8 @@ namespace nuserv.UiTests.Repository
             builder.RegisterModule(new ConfigurationSettingsReader());
             this.container = builder.Build();
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Overview", "In order to manage the nuget repositories I\'ve setup \nAs a user\nI want to see an " +
-                    "overview of my repositories", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Overview", "In order to manage the nuget repositories I\'ve setup \r\nAs a user\r\nI want to see a" +
+                    "n overview of my repositories", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -62,6 +62,10 @@ namespace nuserv.UiTests.Repository
         public virtual void ScenarioTearDown()
         {
             testRunner.OnScenarioEnd();
+            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
+            this.driver = null;
+            ScenarioContext.Current.Remove("Driver");
+            ScenarioContext.Current.Remove("Container");
         }
         
         public virtual void ScenarioSetup(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
@@ -75,10 +79,6 @@ namespace nuserv.UiTests.Repository
         
         public virtual void ScenarioCleanup()
         {
-            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
-            this.driver = null;
-            ScenarioContext.Current.Remove("Driver");
-            ScenarioContext.Current.Remove("Container");
             testRunner.CollectScenarioErrors();
         }
         

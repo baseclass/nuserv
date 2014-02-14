@@ -62,6 +62,10 @@ namespace nuserv.UiTests.Repository
         public virtual void ScenarioTearDown()
         {
             testRunner.OnScenarioEnd();
+            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
+            this.driver = null;
+            ScenarioContext.Current.Remove("Driver");
+            ScenarioContext.Current.Remove("Container");
         }
         
         public virtual void ScenarioSetup(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
@@ -75,10 +79,6 @@ namespace nuserv.UiTests.Repository
         
         public virtual void ScenarioCleanup()
         {
-            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
-            this.driver = null;
-            ScenarioContext.Current.Remove("Driver");
-            ScenarioContext.Current.Remove("Container");
             testRunner.CollectScenarioErrors();
         }
         

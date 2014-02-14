@@ -61,6 +61,10 @@ namespace nuserv.UiTests.Home
         public virtual void ScenarioTearDown()
         {
             testRunner.OnScenarioEnd();
+            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
+            this.driver = null;
+            ScenarioContext.Current.Remove("Driver");
+            ScenarioContext.Current.Remove("Container");
         }
         
         public virtual void ScenarioSetup(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
@@ -74,10 +78,6 @@ namespace nuserv.UiTests.Home
         
         public virtual void ScenarioCleanup()
         {
-            try { System.Threading.Thread.Sleep(50); this.driver.Quit(); } catch (System.Exception) {}
-            this.driver = null;
-            ScenarioContext.Current.Remove("Driver");
-            ScenarioContext.Current.Remove("Container");
             testRunner.CollectScenarioErrors();
         }
         
@@ -90,12 +90,14 @@ namespace nuserv.UiTests.Home
         [NUnit.Framework.DescriptionAttribute("Navigate to welcome page")]
         [NUnit.Framework.TestCaseAttribute("IE", Category="IE", TestName="NavigateToWelcomePage on IE")]
         [NUnit.Framework.TestCaseAttribute("Firefox", Category="Firefox", TestName="NavigateToWelcomePage on Firefox")]
+        [NUnit.Framework.TestCaseAttribute("Chrome", Category="Chrome", TestName="NavigateToWelcomePage on Chrome")]
         public virtual void NavigateToWelcomePage(string browser)
         {
             InitializeSelenium(browser);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Navigate to welcome page", new string[] {
                         "Browser:IE",
-                        "Browser:Firefox"});
+                        "Browser:Firefox",
+                        "Browser:Chrome"});
 #line 9
 this.ScenarioSetup(scenarioInfo);
 #line 10
