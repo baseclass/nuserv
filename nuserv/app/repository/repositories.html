@@ -8,7 +8,7 @@
 <div class="container" ng-show="model.repositoryRows.length > 0 && !model.isAjaxInProgress">
     <div class="row" ng-repeat="row in model.repositoryRows">
         <div class="col-md-3" ng-repeat="repository in row">
-            <div ng-show="!repository.isNew">
+            <div class="repository" ng-show="!repository.isNew" ng-attr-id="{{ repository.Name }}">
                 <h3><i class="fa fa-archive fa-align-left"></i> <span>{{ repository.Name }}</span></h3>
                 <h6>api url: repository/{{ repository.Id }}</h6>
                 <h6>feed url: repository/{{ repository.Id }}/api/v2</h6>
@@ -16,7 +16,7 @@
                     <span>{{ repository.Description }}</span>
                 </p>
             </div>
-            <div ng-show="repository.isNew">
+            <div class="newRepository" ng-show="repository.isNew">
                 <h3 class="form-group" ng-class="{'has-error': repository.errorName.length > 0}">
                     <input class="form-control" type="text" ng-model="repository.Name" id="name" placeholder="Repository name" />
                     <label for="name" class="help-block" ng-show="repository.errorName.length > 0"> {{ repository.errorName }} </label>
@@ -32,7 +32,7 @@
                     <label for="description" class="help-block" ng-show="repository.errorDescription.length > 0"> {{ repository.errorDescription }} </label>
                 </p>
                 <p>
-                    <button class="btn btn-default" ng-click="save(repository);">Save</button>
+                    <button id="saveNewRepository" class="btn btn-default" ng-click="save(repository);">Save</button>
                 </p>
             </div>
         </div>
