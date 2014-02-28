@@ -108,6 +108,55 @@ this.ScenarioSetup(scenarioInfo);
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Look at list of repositories")]
+        [NUnit.Framework.TestCaseAttribute("AGrade", Category="AGrade", TestName="LookAtListOfRepositories on AGrade")]
+        public virtual void LookAtListOfRepositories(string browser)
+        {
+            InitializeSelenium(browser);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Look at list of repositories", new string[] {
+                        "Browser:AGrade"});
+#line 14
+this.ScenarioSetup(scenarioInfo);
+#line 15
+ testRunner.Given("I navigated to /repository", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 16
+ testRunner.Then("I should see atleast 1 existing repository", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 17
+ testRunner.And("I should see a form to create a new repository", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Look at list of repositories details")]
+        [NUnit.Framework.TestCaseAttribute("AGrade", Category="AGrade", TestName="LookAtListOfRepositoriesDetails on AGrade")]
+        public virtual void LookAtListOfRepositoriesDetails(string browser)
+        {
+            InitializeSelenium(browser);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Look at list of repositories details", new string[] {
+                        "Browser:AGrade"});
+#line 20
+this.ScenarioSetup(scenarioInfo);
+#line 21
+ testRunner.Given("I navigated to /repository", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+            TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Title",
+                        "ApiUrl",
+                        "FeedUrl",
+                        "Description"});
+            table1.AddRow(new string[] {
+                        "external/ProjectX",
+                        "repository/external-projectx",
+                        "repository/external-projectx/api/v2",
+                        "Curated nuget repository for project projectX"});
+#line 22
+ testRunner.Then("I should see atleast the following repositories:", ((string)(null)), table1, "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

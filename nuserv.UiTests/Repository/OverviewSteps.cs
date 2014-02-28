@@ -24,12 +24,12 @@ namespace nuserv.UiTests.Repository
             }
         }
 
-        [Then(@"I should see (.*) existing repository")]
+        [Then(@"I should see atleast (.*) existing repository")]
         public void ThenIShouldSeeExistingRepository(int p0)
         {
             var repositories = Wait.Until(d => d.FindElements(By.ClassName("repository")));
 
-            Assert.AreEqual(p0, repositories.Count(r => !r.GetAttribute("class").Contains("ng-hide")), "Number of repositories wrong");
+            Assert.GreaterOrEqual(repositories.Count(r => !r.GetAttribute("class").Contains("ng-hide")), p0, "Number of repositories wrong");
         }
 
         [Then(@"I should see a form to create a new repository")]
@@ -40,16 +40,32 @@ namespace nuserv.UiTests.Repository
             Assert.AreEqual(1, newRepositories.Count(r => !r.GetAttribute("class").Contains("ng-hide")), "New repository creation form not found!");
         }
 
-        [Then(@"I should see the following repositories:")]
+        [Then(@"I should see atleast the following repositories:")]
         public void ThenIShouldSeeTheFollowingRepositories(Table table)
         {
             var repositories = Wait.Until(d => d.FindElements(By.ClassName("repository")).Where(r => !r.GetAttribute("class").Contains("ng-hide"))).ToArray();
 
-            Assert.AreEqual(repositories.Count(), table.RowCount, "Number of repositories wrong");
+            Assert.GreaterOrEqual(repositories.Count(), table.RowCount, "Number of repositories wrong");
 
             for(var i = 0; i < table.RowCount; i++)
             {
-                HtmlRepositoryUtility.CompareRepository(table.Rows[i], repositories[i]);
+                IWebElement repository = null;
+                var tableRow = table.Rows[i];
+
+                var title = tableRow["Title"];
+
+                for (var z = 0; z < repositories.Count(); z++)
+                {
+                    repository = repositories[z].FindElement(By.Id(title));
+                    if (repository != null)
+                    {
+                        break;
+                    }
+                }
+
+                Assert.NotNull(repository, string.Format("Can't find repository {0}", title));
+
+                HtmlRepositoryUtility.CompareRepository(tableRow, repository);
             }
         }
     }
