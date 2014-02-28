@@ -13,22 +13,12 @@ namespace nuserv.UiTests.Repository
     [Binding]
     public class AddRepositorySteps
     {
-        private WebDriverWait wait;
         public WebDriverWait Wait
         {
             get
             {
-                if (wait == null)
-                {
-                    this.wait = new WebDriverWait(Browser.Current, TimeSpan.FromSeconds(10));
-                }
-                return wait;
+                return new WebDriverWait(Browser.Current, TimeSpan.FromSeconds(10));
             }
-        }
-
-        public void ResetWait()
-        {
-            wait = null;
         }
 
         [Given(@"I have entered the following information:")]
@@ -73,13 +63,32 @@ namespace nuserv.UiTests.Repository
 
            ((IJavaScriptExecutor)Browser.Current).ExecuteScript("arguments[0].scrollIntoView(true);", saveButton);
            
-           Thread.Sleep(500);
+           var MAX_STALE_ELEMENT_RETRIES = 10;
+           var retries = 0;
 
-           saveButton.Click();
+           while (true)
+           {
+               try
+               {
+                   Thread.Sleep(500);
 
-           Thread.Sleep(500);
+                   saveButton.Click();
 
-           ResetWait();
+                   return;
+               }
+               catch (StaleElementReferenceException e)
+               {
+                   if (retries < MAX_STALE_ELEMENT_RETRIES)
+                   {
+                       retries++;
+                       continue;
+                   }
+                   else
+                   {
+                       throw e;
+                   }
+               }
+           }
         }
 
         [Then(@"I should see the following repository:")]
