@@ -127,13 +127,16 @@
     <None Include="App.UiTesting.config">
       <DependentUpon>App.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Home\Index.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>Index.feature.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
-    <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
+    <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Repository\AddRepository.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>AddRepository.feature.cs</LastGenOutput>
@@ -142,11 +145,23 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>Overview.feature.cs</LastGenOutput>
     </None>
+    <None Include="SauceLabsConfig\AGradeChrome31Win8.config" />
+    <None Include="SauceLabsConfig\AGradeFirefox26Win8.config" />
+    <None Include="SauceLabsConfig\AGradeIE10Win8.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+      <SauceLabsConfigToTransform Include="SauceLabsConfig\*.config">
+        <Source>%(Identity)</Source>
+        <Destination>$(OutputPath)$(AssemblyName).%(Filename).dll%(Extension)</Destination>
+		<NewAssembly>$(OutputPath)$(AssemblyName).%(Filename).dll</NewAssembly>
+      </SauceLabsConfigToTransform>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
@@ -154,7 +169,15 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild">    
+  </Target>
+  <Target Name="TransformSauceLabsConfiguration" Inputs="@(SauceLabsConfigToTransform)" Outputs="%(SauceLabsConfigToTransform.Destination)" AfterTargets="AfterBuild">
+    <Message Text="Transforming App.config with %(SauceLabsConfigToTransform.Source) to %(SauceLabsConfigToTransform.Destination)" />
+    <SlowCheetah.Xdt.TransformXml Source="App.config" Transform="%(SauceLabsConfigToTransform.Source)" Destination="%(SauceLabsConfigToTransform.Destination)" />
+  </Target>
+  <Target Name="CopyTestAssembly" Inputs="@(SauceLabsConfigToTransform)" Outputs="%(SauceLabsConfigToTransform.NewAssembly)" AfterTargets="AfterBuild">
+    <Message Text="Copy $(OutputPath)$(AssemblyName).dll to %(SauceLabsConfigToTransform.Destination)" />
+	<Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFiles="%(SauceLabsConfigToTransform.NewAssembly)" />
+  </Target>
 </Project>
