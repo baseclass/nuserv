@@ -3,9 +3,7 @@
 	As a user
 	I want to see a welcome page
 
-@Browser:IE
-@Browser:Firefox
-@Browser:Chrome
+@Browser:AGrade
 Scenario: Navigate to welcome page
 	Given I navigated to /
 	Then the browser title should be "nuserv - private nuget repositories"

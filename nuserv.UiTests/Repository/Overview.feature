@@ -3,26 +3,20 @@
 	As a user
 	I want to see an overview of my repositories
 
-@Browser:IE
-@Browser:Firefox
-@Browser:Chrome
+@Browser:AGrade
 Scenario: Navigate to repository
 	Given I navigated to /repository
 	Then the browser title should be "nuserv repositories"
 	And the title should be "repositories"
 	And the lead should be "manage repositories"
 
-@Browser:IE
-@Browser:Firefox
-@Browser:Chrome
+@Browser:AGrade
 Scenario: Look at list of repositories
 	Given I navigated to /repository
 	Then I should see 1 existing repository
 	And I should see a form to create a new repository
 
-@Browser:IE
-@Browser:Firefox
-@Browser:Chrome
+@Browser:AGrade
 Scenario: Look at list of repositories details
 	Given I navigated to /repository
 	Then I should see the following repositories:
