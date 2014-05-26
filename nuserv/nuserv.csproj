@@ -139,17 +139,17 @@
     <Reference Include="Ninject.Web.WebApi">
       <HintPath>..\packages\Ninject.Web.WebApi-RC.3.0.0.22\lib\net45-full\Ninject.Web.WebApi.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.7.41101.299, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Core, Version=2.8.50126.400, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NuGet.Core.2.7.2\lib\net40-Client\NuGet.Core.dll</HintPath>
+      <HintPath>..\packages\NuGet.Core.2.8.0\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Lucene, Version=2.3.0.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Lucene, Version=2.9.4.47, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NuGet.Lucene.2.3.0\lib\net451\NuGet.Lucene.dll</HintPath>
+      <HintPath>..\packages\NuGet.Lucene.2.9.4\lib\net451\NuGet.Lucene.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Lucene.Web, Version=2.3.0.31, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Lucene.Web, Version=2.9.4.47, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NuGet.Lucene.Web.2.3.0\lib\net451\NuGet.Lucene.Web.dll</HintPath>
+      <HintPath>..\packages\NuGet.Lucene.Web.2.9.4\lib\net451\NuGet.Lucene.Web.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=1.15.9.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

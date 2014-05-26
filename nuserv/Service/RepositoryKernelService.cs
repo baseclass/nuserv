@@ -173,10 +173,9 @@
         {
             var cfg = CreateLuceneRepositoryConfigurator(name);
 
-            var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(
-                cfg.Repository,
+            var mirroringPackageRepository = MirroringPackageRepositoryFactory.Create(cfg.Repository,
                 PackageMirrorTargetUrl,
-                PackageMirrorTimeout);
+                PackageMirrorTimeout, false);
 
             var kernel = this.childKernelFactory.Create(this.resolutionRoot);
 
