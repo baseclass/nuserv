@@ -1,4 +1,6 @@
-﻿namespace nuserv.Service
+﻿using NuGet.Lucene.Web.Symbols;
+
+namespace nuserv.Service
 {
     #region Usings
 
@@ -182,6 +184,13 @@
             kernel.Bind<ILucenePackageRepository>().ToConstant(cfg.Repository).OnDeactivation(_ => cfg.Dispose());
             kernel.Bind<IMirroringPackageRepository>().ToConstant(mirroringPackageRepository);
             kernel.Bind<LuceneDataProvider>().ToConstant(cfg.Provider);
+            var symbolsPath = MapPathFromAppSetting("symbolsPath", string.Format("~/App_Data/{0}/Symbols", name));
+            kernel.Bind<ISymbolSource>().ToConstant(new SymbolSource { SymbolsPath = symbolsPath });
+            kernel.Bind<SymbolTools>().ToConstant(new SymbolTools
+            {
+                SymbolPath = symbolsPath,
+                ToolPath = MapPathFromAppSetting("debuggingToolsPath", string.Empty)
+            });
 
             if (GetFlagFromAppSetting("synchronizeOnStart", true))
             {

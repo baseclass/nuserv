@@ -165,6 +165,28 @@
                 new { version = new SemanticVersionConstraint() });
         }
 
+        public void MapSymbolSourceRoutes(HttpConfiguration config)
+        {
+            var routes = config.Routes;
+
+
+            routes.MapHttpRoute(RouteNames.Sources,
+                                this.repositoryPrefix + this.pathPrefix + "source/{id}/{version}/{*path}",
+                                new { controller = "SourceFiles" },
+                                new { version = new SemanticVersionConstraint() });
+
+
+            routes.MapHttpRoute(RouteNames.Symbols.Settings,
+                        this.repositoryPrefix + this.pathPrefix + "symbol-settings",
+                        new { controller = "Symbols", action = "GetSettings" });
+
+
+            routes.MapHttpRoute(RouteNames.Symbols.GetFile,
+                        this.repositoryPrefix + this.pathPrefix + "symbols/{*path}",
+                        new { controller = "Symbols", action = "GetFile" });
+        }
+
+
         public void MapDataServiceRoutes(RouteCollection routes)
         {
             var dataServiceHostFactory = new RewriteBaseUrlNinjectDataServiceHostFactory();

@@ -46,6 +46,7 @@
             var routeMapper = resolutionRoot.Get<NuGetMultiRepositoryWebApiRouteMapper>();
 
             routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
+            routeMapper.MapSymbolSourceRoutes(GlobalConfiguration.Configuration);
             routeMapper.MapDataServiceRoutes(RouteTable.Routes);
         }
 
