@@ -1,10 +1,12 @@
 ﻿#region Usings
 
+using System;
 using System.Collections.Generic;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Hosting;
 using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Http.ExceptionHandling;
@@ -50,6 +52,7 @@ namespace nuserv
 
         public void Configuration(IAppBuilder app)
         {
+            Environment.CurrentDirectory = HostingEnvironment.MapPath("~/");
             SignatureConversions.AddConversions(app);
             Settings = CreateSettings();
             var config = CreateHttpConfiguration();
