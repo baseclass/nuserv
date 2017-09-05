@@ -140,7 +140,7 @@ namespace nuserv.Service
         private string FormatPath(string path, string name)
         {
             if (!path.Contains("{0}"))
-                path = path.Replace("~/App_Data/", "~/App_Data/{0}/");
+                path = path.Replace("App_Data\\", "App_Data\\{0}\\");
 
             return string.Format(path, name);
         }
