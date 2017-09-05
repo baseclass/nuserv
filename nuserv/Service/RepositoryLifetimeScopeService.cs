@@ -129,7 +129,7 @@ namespace nuserv.Service
 
 
                 if (settings.SynchronizeOnStart)
-                    cfg.Repository.SynchronizeWithFileSystem(SynchronizationMode.Complete,
+                    cfg.Repository.SynchronizeWithFileSystem(SynchronizationMode.Incremental,
                         stopSynchronizationCancellationTokenSource.Token);
             });
 
