@@ -86,8 +86,6 @@ namespace nuserv
             RegisterServices(container, app, config);
 
             RegisterShutdown(app, container);
-
-            StartIndexingIfConfigured(container);
         }
 
         protected virtual HttpConfiguration CreateHttpConfiguration()
@@ -190,23 +188,6 @@ namespace nuserv
             formatter.SupportedMediaTypes.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
             formatter.SupportedMediaTypes.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
             return formatter;
-        }
-
-        protected virtual void StartIndexingIfConfigured(IContainer container)
-        {
-            if (!Settings.SynchronizeOnStart) return;
-
-            var repository = container.Resolve<ILucenePackageRepository>();
-            var tcs = container.Resolve<StopSynchronizationCancellationTokenSource>();
-            var taskRunner = container.Resolve<ITaskRunner>();
-
-            taskRunner.QueueBackgroundWorkItem(async shutdownCancellationToken =>
-            {
-                using (shutdownCancellationToken.Register(tcs.Cancel))
-                {
-                    await repository.SynchronizeWithFileSystem(SynchronizationMode.Incremental, tcs.Token);
-                }
-            });
         }
 
         private class LoggingExceptionHandler : IExceptionHandler
