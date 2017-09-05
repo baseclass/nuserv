@@ -1,0 +1,13 @@
+{
+  "name": "nuserv",
+  "dependencies": {
+    "font-awesome": "Font-Awesome#v4.7.0",
+    "bootstrap": "v3.3.7",
+    "angular": "angularjs#v1.6.6",
+    "angular-route": "v1.6.6"
+  },
+  "resolutions": {
+    "angular": "v1.6.6",
+    "angular-route": "v1.6.6"
+  }
+}
