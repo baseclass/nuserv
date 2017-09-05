@@ -1,10 +1,9 @@
-﻿namespace NuGet.Lucene.Web.Extension.Controllers
+﻿using AspNet.WebApi.HtmlMicrodataFormatter;
+using NuGet.Lucene.Web.Controllers;
+
+namespace NuGet.Lucene.Web.Extension.Controllers
 {
     #region Usings
-
-    using AspNet.WebApi.HtmlMicrodataFormatter;
-
-    using NuGet.Lucene.Web.DataServices;
 
     #endregion
 
@@ -16,7 +15,6 @@
     {
         #region Public Properties
 
-        [Ninject.Inject]
         public NuGetMultiRepositoryWebApiRouteMapper NuGetWebApiRouteMapper { get; set; }
 
         #endregion
@@ -32,18 +30,9 @@
 
             docs.Add(
                 "Packages",
-                new SimpleApiDescription(this.Request, "OData", this.NuGetWebApiRouteMapper.ODataRoutePath)
+                new SimpleApiDescription(Request, "OData", NuGetWebApiRouteMapper.ODataRoutePath)
                 {
-                    Documentation
-                        =
-                        this
-                        .DocumentationProvider
-                        .GetDocumentation
-                        (
-                            typeof
-                        (
-                        PackageDataService
-                        ))
+                    Documentation = DocumentationProvider.GetDocumentation(typeof(PackagesODataController))
                 });
 
             return docs;

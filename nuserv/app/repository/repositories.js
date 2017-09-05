@@ -86,18 +86,18 @@ app.controller('RepositoriesController', [
                     url: '/api/repository',
                     method: "GET"
                 }).
-                success(function(data, status, headers, config) {
+                then(function(response) {
                     // this callback will be called asynchronously
                     // when the response is available
-                    $scope.model.repositories = data;
+                    $scope.model.repositories = response.data;
 
                     //We are done with AJAX loading
                     $scope.model.isAjaxInProgress = false;
                 }).
-                error(function(data, status, headers, config) {
+                catch(function(response) {
                     // called asynchronously if an error occurs
                     // or server returns response with an error status.
-                    $scope.model.errorMessage = "Error occurred status:" + status;
+                    $scope.model.errorMessage = "Error occurred status:" + response.status;
 
                     //We are done with AJAX loading
                     $scope.model.isAjaxInProgress = false;
@@ -124,7 +124,7 @@ app.controller('RepositoriesController', [
                         url: '/api/repository',
                         method: "POST",
                         data: repository
-                    }).success(function (data, status, headers, config) {
+                    }).then(function () {
                         repository.isNew = false;
 
                         var rowCount = $scope.model.repositoryRows.length;
@@ -139,8 +139,8 @@ app.controller('RepositoriesController', [
                         //Add new repository
                         row.push(repositoryListViewModelFactory.create({ Id: '', Name: '', Description: '', isNew: true }));
 
-                    }).error(function (data, status, headers, config) {
-                        repository.errorName = data.ExceptionMessage;
+                    }).catch(function (response) {
+                        repository.errorName = response.data.ExceptionMessage;
                     });
                 }
             };

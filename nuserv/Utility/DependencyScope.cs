@@ -1,31 +1,23 @@
-﻿namespace nuserv.Utility
+﻿using System;
+using System.Collections.Generic;
+using System.Web.Http.Dependencies;
+using Autofac;
+
+namespace nuserv.Utility
 {
-    #region Usings
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web.Http.Dependencies;
-
-    using Ninject;
-    using Ninject.Parameters;
-    using Ninject.Syntax;
-
-    #endregion
-
     public class DependencyScope : IDependencyScope
     {
         #region Fields
 
-        private readonly IResolutionRoot resolutionRoot;
+        private readonly ILifetimeScope lifetimeScope;
 
         #endregion
 
         #region Constructors and Destructors
 
-        public DependencyScope(IResolutionRoot resolutionRoot)
+        public DependencyScope(ILifetimeScope lifetimeScope)
         {
-            this.resolutionRoot = resolutionRoot;
+            this.lifetimeScope = lifetimeScope;
         }
 
         #endregion
@@ -34,22 +26,24 @@
 
         public void Dispose()
         {
-            var disposable = this.resolutionRoot as IDisposable;
+            var disposable = lifetimeScope as IDisposable;
             if (disposable != null)
-            {
                 disposable.Dispose();
-            }
         }
 
         public object GetService(Type serviceType)
         {
-            var request = this.resolutionRoot.CreateRequest(serviceType, null, new Parameter[0], true, true);
-            return this.resolutionRoot.Resolve(request).SingleOrDefault();
+            if (!lifetimeScope.IsRegistered(serviceType))
+            {
+                return null;
+            }
+
+            return lifetimeScope.Resolve(serviceType);
         }
 
         public IEnumerable<object> GetServices(Type serviceType)
         {
-            return this.resolutionRoot.GetAll(serviceType);
+            return (IEnumerable<object>) lifetimeScope.Resolve(typeof(IEnumerable<>).MakeGenericType(serviceType));
         }
 
         #endregion

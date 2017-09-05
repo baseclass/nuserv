@@ -1,79 +1,54 @@
-﻿namespace nuserv
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Versioning;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Mvc;
+using Autofac;
+using nuserv.Controllers;
+using nuserv.Models;
+using nuserv.Models.Contracts;
+using nuserv.Service;
+using nuserv.Service.Contracts;
+using nuserv.Utility;
+using NuGet;
+using NuGet.Lucene;
+using NuGet.Lucene.IO;
+
+namespace nuserv
 {
-    #region Usings
-
-    using System;
-    using System.Web.Http;
-    using System.Web.Http.Dependencies;
-    using System.Web.Routing;
-
-    using Ninject;
-    using Ninject.Extensions.Factory;
-    using Ninject.Modules;
-    using Ninject.Parameters;
-    using Ninject.Syntax;
-    using Ninject.Web.Common;
-
-    using NuGet.Lucene.Web.Extension;
-
-    using nuserv.Models;
-    using nuserv.Models.Contracts;
-    using nuserv.Service;
-    using nuserv.Service.Contracts;
-    using nuserv.Utility;
-
-    using IInstanceProvider = System.ServiceModel.Dispatcher.IInstanceProvider;
-
-    #endregion
-
-    public class NuservModule : NinjectModule
+    public class NuservModule : Module
     {
-        #region Public Methods and Operators
+        private readonly HttpConfiguration config;
 
-        public override void Load()
+        public NuservModule(HttpConfiguration config)
         {
-            RegisterServices(this.Kernel);
-
-            Initialize(this.Kernel);
+            this.config = config;
         }
-
-        #endregion
 
         #region Methods
 
-        private static void Initialize(IResolutionRoot resolutionRoot)
+        protected override void Load(ContainerBuilder builder)
         {
-            var routeMapper = resolutionRoot.Get<NuGetMultiRepositoryWebApiRouteMapper>();
+            base.Load(builder);
 
-            routeMapper.MapApiRoutes(GlobalConfiguration.Configuration);
-            routeMapper.MapSymbolSourceRoutes(GlobalConfiguration.Configuration);
-            routeMapper.MapDataServiceRoutes(RouteTable.Routes);
-        }
+            builder.RegisterInstance(config);
 
-        private static void RegisterServices(IBindingRoot bindingRoot)
-        {
-            bindingRoot.Bind<IChildKernelFactory>().To<ChildKernelFactory>().InSingletonScope();
-            bindingRoot.Bind<IResolutionRootResolver>().To<ResolutionRootResolver>().InRequestScope();
-            bindingRoot.Bind<IRepositoryKernelService>().To<RepositoryKernelService>().InSingletonScope();
-            bindingRoot.Bind<IHttpRouteDataResolver>().To<HttpRouteDataResolver>().InSingletonScope();
-            bindingRoot.Bind<IRepositoryManager>().To<RepositoryManager>().InSingletonScope();
-            bindingRoot.Bind<IRepositoryRepository>().To<RepositoryRepository>();
+            builder.RegisterType<LifetimeScopeFactory>().As<ILifetimeScopeFactory>().SingleInstance();
 
-            bindingRoot.Bind<IRepository>().To<Repository>();
-            bindingRoot.Bind<IRepositoryFactory>().ToFactory().InSingletonScope();
+            builder.RegisterType<LifetimeScopeResolver>().As<ILifetimeScopeResolver>().SingleInstance();
+            builder.RegisterType<RepositoryLifetimeScopeService>().As<IRepositoryLifetimeScopeService>().SingleInstance();
+            builder.RegisterType<HttpRouteDataResolver>().As<IHttpRouteDataResolver>().SingleInstance();
+            builder.RegisterType<RepositoryManager>().As<IRepositoryManager>().SingleInstance();
+            builder.RegisterType<RepositoryRepository>().As<IRepositoryRepository>();
+            builder.RegisterType<NuserveDependencyResolver>();
+            builder.RegisterType<MultiRepositoryPackageFormDataMediaFormatter>();
+            builder.RegisterType<WebApi.Controllers.RepositoryController>();
 
-            // Remove default ninject dependency resolver and bind to one which creates a child kernel per request
-            // and uses an IResolutionRootResolver to get the resolution root to create a child kernel from.
-            bindingRoot.Unbind<IDependencyResolver>();
-            bindingRoot.Bind<IDependencyResolver>().To<DependencyResolver>();
-
-            // Remove default ninject IInstanceProvider and use one which uses an IDependencyResolver to create an instance.
-            // That way WCF uses the same mechanism as WebAPI to get dependencies.
-            bindingRoot.Bind<IInstanceProvider>().To<DependencyResolverInstanceProvider>();
-            bindingRoot.Unbind<Func<Type, IInstanceProvider>>();
-            bindingRoot.Bind<Func<Type, IInstanceProvider>>()
-                .ToMethod(
-                    ctx => type => ctx.Kernel.Get<IInstanceProvider>(new ConstructorArgument("serviceType", type)));
+            builder.RegisterType<Repository>().As<IRepository>();
+            builder.RegisterType<RepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
         }
 
         #endregion

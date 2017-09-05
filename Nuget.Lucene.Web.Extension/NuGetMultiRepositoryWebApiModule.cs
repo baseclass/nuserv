@@ -1,90 +1,50 @@
-﻿namespace NuGet.Lucene.Web.Extension
+﻿using System.IO;
+using System.Net.Http.Formatting;
+using System.Web.Hosting;
+using Autofac;
+using Autofac.Integration.WebApi;
+using Lucene.Net.Linq;
+using Lucene.Net.Store;
+using Lucene.Net.Util;
+using NuGet.Lucene.Web.Authentication;
+using NuGet.Lucene.Web.Formatters;
+using NuGet.Lucene.Web.Middleware;
+
+namespace NuGet.Lucene.Web.Extension
 {
-    #region Usings
-
-    using System.Configuration;
-    using System.IO;
-    using System.Web;
-    using System.Web.Hosting;
-
-    using global::Lucene.Net.Linq;
-    using global::Lucene.Net.Store;
-    using global::Lucene.Net.Util;
-
-    using Ninject.Modules;
-    using Ninject.Selection.Heuristics;
-
-    using NuGet.Lucene.Web.Authentication;
-    using NuGet.Lucene.Web.DataServices;
-    using NuGet.Lucene.Web.Modules;
-
-    #endregion
-
-    public class NuGetMultiRepositoryWebApiModule : NinjectModule
+    public class NuGetMultiRepositoryWebApiModule : Module
     {
+        public NuGetMultiRepositoryWebApiModule()
+            : this(new NuGetWebApiSettings())
+        {
+        }
+
+        public NuGetMultiRepositoryWebApiModule(INuGetWebApiSettings nuGetWebApiSettings)
+        {
+            settings = nuGetWebApiSettings;
+        }
+
         #region Constants
 
-        public const string AppSettingNamespace = "NuGet.Lucene.Web:";
-
         public const string DefaultRepositoryRoutePrefix = "repository/{repository}/";
-
-        public const string DefaultRoutePathPrefix = "";
-
-        #endregion
-
-        #region Public Properties
-
-        public static bool AllowAnonymousPackageChanges
-        {
-            get
-            {
-                return GetFlagFromAppSetting("allowAnonymousPackageChanges", false);
-            }
-        }
-
-        public static bool EnableCrossDomainRequests
-        {
-            get
-            {
-                return GetFlagFromAppSetting("enableCrossDomainRequests", false);
-            }
-        }
-
-        public static bool HandleLocalRequestsAsAdmin
-        {
-            get
-            {
-                return GetFlagFromAppSetting("handleLocalRequestsAsAdmin", false);
-            }
-        }
-
-        public static string RepositoryPathPrefix
-        {
-            get
-            {
-                return GetAppSetting("repositoryRoutePathPrefix", DefaultRepositoryRoutePrefix);
-            }
-        }
-
-        public static string RoutePathPrefix
-        {
-            get
-            {
-                return GetAppSetting("routePathPrefix", DefaultRoutePathPrefix);
-            }
-        }
-
-        public static bool ShowExceptionDetails
-        {
-            get
-            {
-                return GetFlagFromAppSetting("showExceptionDetails", false);
-            }
-        }
+        private readonly INuGetWebApiSettings settings;
 
         #endregion
 
         #region Public Methods and Operators
+
+        protected virtual IUserStore InitializeUserStore(INuGetWebApiSettings settings)
+        {
+            var usersDataProvider = InitializeUsersDataProvider(HostingEnvironment.MapPath("~/App_Data/"));
+            var userStore = new UserStore(usersDataProvider)
+            {
+                LocalAdministratorApiKey = settings.LocalAdministratorApiKey,
+                HandleLocalRequestsAsAdmin = settings.HandleLocalRequestsAsAdmin
+            };
+            userStore.Initialize();
+            return userStore;
+        }
+
 
         public virtual LuceneDataProvider InitializeUsersDataProvider(string path)
         {
@@ -92,77 +52,50 @@
             var directoryInfo = new DirectoryInfo(usersIndexPath);
             var dir = FSDirectory.Open(directoryInfo, new NativeFSLockFactory(directoryInfo));
             var provider = new LuceneDataProvider(dir, Version.LUCENE_30)
-                           {
-                               Settings =
-                               {
-                                   EnableMultipleEntities =
-                                       false
-                               }
-                           };
+            {
+                Settings =
+                {
+                    EnableMultipleEntities = false,
+                    MergeFactor = 2
+                }
+            };
             return provider;
         }
 
-        public override void Load()
+        protected override void Load(ContainerBuilder builder)
         {
-            this.Kernel.Components.Add<IInjectionHeuristic, NonDecoratedPropertyInjectionHeuristic>();
+            builder.RegisterInstance(settings).As<INuGetWebApiSettings>();
 
-            var routeMapper = new NuGetMultiRepositoryWebApiRouteMapper(RoutePathPrefix, RepositoryPathPrefix);
-            var usersDataProvider = this.InitializeUsersDataProvider(HostingEnvironment.MapPath("~/App_Data/"));
+            var routeMapper =
+                new NuGetMultiRepositoryWebApiRouteMapper(settings.RoutePathPrefix, DefaultRepositoryRoutePrefix);
+            var userStore = InitializeUserStore(settings);
 
-            this.Bind<NuGetMultiRepositoryWebApiRouteMapper>().ToConstant(routeMapper);
+            builder.RegisterInstance(routeMapper);
 
-            this.Bind<UserStore>().ToConstant(new UserStore(usersDataProvider));
+            builder.RegisterInstance(userStore);
 
-            this.Bind<PackageServiceStreamProvider>().To<PackageServiceStreamProviderExt>();
+            LoadAuthMiddleware(builder, settings);
 
-            this.LoadAuthentication();
+            builder.RegisterInstance(new StopSynchronizationCancellationTokenSource());
 
-            var tokenSource = new ReusableCancellationTokenSource();
-            this.Bind<ReusableCancellationTokenSource>().ToConstant(tokenSource);
+            builder.RegisterType<PackageFormDataMediaFormatter>().As<MediaTypeFormatter>();
+            builder.RegisterApiControllers(typeof(NuGetWebApiModule).Assembly).PropertiesAutowired();
         }
 
-        public virtual void LoadAuthentication()
+        public virtual void LoadAuthMiddleware(ContainerBuilder builder, INuGetWebApiSettings settings)
         {
-            this.Bind<IApiKeyAuthentication>().To<LuceneApiKeyAuthentication>();
+            builder.RegisterType<LuceneApiKeyAuthentication>().As<IApiKeyAuthentication>().PropertiesAutowired();
 
-            if (AllowAnonymousPackageChanges)
-            {
-                this.Bind<IHttpModule>().To<AnonymousPackageManagerModule>();
-            }
+            if (settings.AllowAnonymousPackageChanges)
+                builder.RegisterType<AnonymousPackageManagerMiddleware>().InstancePerRequest().PropertiesAutowired();
             else
-            {
-                // ApiKeyAuthenticationModule fails if there is a wrong api key, it's not possible to push a package with Nuget Package Explorer without api key.
-                // So just load this module if anonymous package changes are not allowed. Differs from default NuGet.Lucene.Web implementation.
-                this.Bind<IHttpModule>().To<ApiKeyAuthenticationModule>();
-            }
+                builder.RegisterType<ApiKeyAuthenticationMiddleware>().InstancePerRequest().PropertiesAutowired();
 
-            if (HandleLocalRequestsAsAdmin)
-            {
-                this.Bind<IHttpModule>().To<LocalRequestAuthenticationModule>();
-            }
-        }
+            if (settings.HandleLocalRequestsAsAdmin)
+                builder.RegisterType<LocalRequestAuthenticationMiddleware>().InstancePerRequest().PropertiesAutowired();
 
-        #endregion
-
-        #region Methods
-
-        internal static string GetAppSetting(string key, string defaultValue)
-        {
-            var value = ConfigurationManager.AppSettings[GetAppSettingKey(key)];
-            return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
-        }
-
-        internal static bool GetFlagFromAppSetting(string key, bool defaultValue)
-        {
-            var flag = GetAppSetting(key, string.Empty);
-
-            bool result;
-            return bool.TryParse(flag ?? string.Empty, out result) ? result : defaultValue;
-        }
-
-        private static string GetAppSettingKey(string key)
-        {
-            return AppSettingNamespace + key;
+            if (settings.RoleMappingsEnabled)
+                builder.RegisterType<RoleMappingAuthenticationMiddleware>().InstancePerRequest().PropertiesAutowired();
         }
 
         #endregion

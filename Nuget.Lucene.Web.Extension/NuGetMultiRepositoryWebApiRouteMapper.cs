@@ -1,56 +1,46 @@
-﻿namespace NuGet.Lucene.Web.Extension
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.OData.Extensions;
+using System.Web.Http.OData.Formatter;
+using System.Web.Http.OData.Formatter.Deserialization;
+using System.Web.Http.OData.Routing.Conventions;
+using System.Web.Http.Routing;
+using NuGet.Lucene.Web.OData.Batch;
+using NuGet.Lucene.Web.OData.Formatter.Serialization;
+using NuGet.Lucene.Web.OData.Routing;
+using NuGet.Lucene.Web.OData.Routing.Conventions;
+
+namespace NuGet.Lucene.Web.Extension
 {
     #region Usings
-
-    using System.Net.Http;
-    using System.Web.Http;
-    using System.Web.Routing;
-
-    using NuGet.Lucene.Web.DataServices;
-
-    using Nuget.Lucene.Web.Extension;
-
-    using HttpMethodConstraint = System.Web.Http.Routing.HttpMethodConstraint;
 
     #endregion
 
     public class NuGetMultiRepositoryWebApiRouteMapper
     {
-        #region Fields
-
-        private readonly string pathPrefix;
-
-        private readonly string repositoryPrefix;
-
-        #endregion
-
         #region Constructors and Destructors
 
         public NuGetMultiRepositoryWebApiRouteMapper(string pathPrefix, string repositoryPrefix)
         {
-            this.pathPrefix = pathPrefix;
+            PathPrefix = pathPrefix;
             this.repositoryPrefix = repositoryPrefix;
         }
 
         #endregion
 
+        #region Fields
+
+        private readonly string repositoryPrefix;
+
+        #endregion
+
         #region Public Properties
 
-        public string ODataRoutePath
-        {
-            get
-            {
-                return this.repositoryPrefix + this.PathPrefix + "api/v2";
-            }
-        }
+        public string ODataRoutePath => repositoryPrefix + PathPrefix + "v2";
 
-        public string PathPrefix
-        {
-            get
-            {
-                return this.pathPrefix;
-            }
-        }
+        public string PathPrefix { get; }
 
         #endregion
 
@@ -62,96 +52,109 @@
 
             routes.MapHttpRoute(
                 AspNet.WebApi.HtmlMicrodataFormatter.RouteNames.ApiDocumentation,
-                this.pathPrefix + "api",
-                new { controller = "NuGetMultiRepositoryDocumentation", action = "GetApiDocumentation" });
+                PathPrefix + "api",
+                new {controller = "NuGetMultiRepositoryDocumentation", action = "GetApiDocumentation"});
 
             routes.MapHttpRoute(
                 AspNet.WebApi.HtmlMicrodataFormatter.RouteNames.TypeDocumentation,
-                this.pathPrefix + "api/schema/{typeName}",
-                new { controller = "NuGetDocumentation", action = "GetTypeDocumentation" });
+                PathPrefix + "schema/{typeName}",
+                new {controller = "NuGetDocumentation", action = "GetTypeDocumentation"});
 
             routes.MapHttpRoute(
                 RouteNames.Indexing,
-                this.pathPrefix + "api/indexing/{action}",
-                new { controller = "Indexing" });
+                PathPrefix + "indexing/{action}",
+                new {controller = "Indexing"});
 
             routes.MapHttpRoute(
                 RouteNames.Users.All,
-                this.pathPrefix + "api/users",
-                new { controller = "Users", action = "GetAllUsers" },
-                new { httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options) });
+                PathPrefix + "users",
+                new {controller = "Users", action = "GetAllUsers"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options)});
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetUser,
-                this.pathPrefix + "api/users/{*username}",
-                new { controller = "Users", action = "Get" },
-                new { username = ".+", method = new HttpMethodConstraint(HttpMethod.Get) });
+                PathPrefix + "users/{*username}",
+                new {controller = "Users", action = "Get"},
+                new {username = ".+", method = new HttpMethodConstraint(HttpMethod.Get)});
 
             routes.MapHttpRoute(
                 RouteNames.Users.PutUser,
-                this.pathPrefix + "api/users/{*username}",
-                new { controller = "Users", action = "Put" },
-                new { username = ".+" });
+                PathPrefix + "users/{*username}",
+                new {controller = "Users", action = "Put"},
+                new {username = ".+"});
 
             routes.MapHttpRoute(
                 RouteNames.Users.DeleteUser,
-                this.pathPrefix + "api/users/{*username}",
-                new { controller = "Users", action = "Delete" },
-                new { username = ".+" });
+                PathPrefix + "users/{*username}",
+                new {controller = "Users", action = "Delete"},
+                new {username = ".+"});
 
             routes.MapHttpRoute(
                 RouteNames.Users.DeleteAll,
-                this.pathPrefix + "api/users",
-                new { controller = "Users", action = "DeleteAllUsers" },
-                new { httpMethod = new HttpMethodConstraint(HttpMethod.Delete) });
+                PathPrefix + "users",
+                new {controller = "Users", action = "DeleteAllUsers"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Delete)});
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetAuthenticationInfo,
-                this.pathPrefix + "api/session",
-                new { controller = "Users", action = "GetAuthenticationInfo" });
+                PathPrefix + "session",
+                new {controller = "Users", action = "GetAuthenticationInfo"});
 
             routes.MapHttpRoute(
                 RouteNames.Users.GetRequiredAuthenticationInfo,
-                this.pathPrefix + "api/authenticate",
-                new { controller = "Users", action = "GetRequiredAuthenticationInfo" });
+                PathPrefix + "authenticate",
+                new {controller = "Users", action = "GetRequiredAuthenticationInfo"});
 
             routes.MapHttpRoute(
-                RouteNames.TabCompletionPackageIds,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package-ids",
-                new { controller = "TabCompletion", action = "GetMatchingPackages" });
+                RouteNames.TabCompletion.VS2013PackageIds,
+                repositoryPrefix + PathPrefix + "v2/package-ids",
+                new {controller = "TabCompletion", action = "GetMatchingPackages"});
 
             routes.MapHttpRoute(
-                RouteNames.TabCompletionPackageVersions,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package-versions/{packageId}",
-                new { controller = "TabCompletion", action = "GetPackageVersions" });
+                RouteNames.TabCompletion.VS2013PackageVersions,
+                repositoryPrefix + PathPrefix + "v2/package-versions/{packageId}",
+                new {controller = "TabCompletion", action = "GetPackageVersions"});
+
+            routes.MapHttpRoute(RouteNames.TabCompletion.VS2015PackageIds,
+                ODataRoutePath + "/package-ids",
+                new {controller = "TabCompletion", action = "GetMatchingPackages"});
+
+            routes.MapHttpRoute(RouteNames.TabCompletion.VS2015PackageVersions,
+                ODataRoutePath + "/package-versions/{packageId}",
+                new {controller = "TabCompletion", action = "GetPackageVersions"});
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Search,
-                this.repositoryPrefix + this.pathPrefix + "api/packages",
-                new { controller = "Packages", action = "Search" },
-                new { httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options) });
+                repositoryPrefix + PathPrefix + "packages",
+                new {controller = "Packages", action = "Search"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options)});
+
+            routes.MapHttpRoute(RouteNames.Packages.GetAvailableSearchFieldNames,
+                repositoryPrefix + PathPrefix + "v2/packages/$searchable-fields",
+                new {controller = "Packages", action = "GetAvailableSearchFieldNames"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options)});
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Upload,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package",
-                new { controller = "Packages" },
-                new { httpMethod = new HttpMethodConstraint(HttpMethod.Put, HttpMethod.Options) });
+                repositoryPrefix + PathPrefix + "v2/package",
+                new {controller = "Packages"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Put, HttpMethod.Options)});
 
             routes.MapHttpRoute(
                 RouteNames.Packages.DownloadLatestVersion,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}",
-                new { controller = "Packages", action = "DownloadPackage" });
+                repositoryPrefix + PathPrefix + "v2/package/{id}",
+                new {controller = "Packages", action = "DownloadPackage"});
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Download,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}",
-                new { controller = "Packages", action = "DownloadPackage" },
-                new { version = new SemanticVersionConstraint() });
+                repositoryPrefix + PathPrefix + "v2/package/{id}/{version}",
+                new {controller = "Packages", action = "DownloadPackage"},
+                new {version = new SemanticVersionConstraint()});
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Info,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}/info",
-                new { controller = "Packages", action = "GetPackageInfo", version = "" },
+                repositoryPrefix + PathPrefix + "v2/package/{id}/{version}/info",
+                new {controller = "Packages", action = "GetPackageInfo", version = RouteParameter.Optional},
                 new
                 {
                     httpMethod = new HttpMethodConstraint(HttpMethod.Get),
@@ -160,9 +163,9 @@
 
             routes.MapHttpRoute(
                 RouteNames.Packages.Delete,
-                this.repositoryPrefix + this.pathPrefix + "api/v2/package/{id}/{version}",
-                new { controller = "Packages", action = "DeletePackage" },
-                new { version = new SemanticVersionConstraint() });
+                repositoryPrefix + PathPrefix + "v2/package/{id}/{version}",
+                new {controller = "Packages", action = "DeletePackage"},
+                new {version = new SemanticVersionConstraint()});
         }
 
         public void MapSymbolSourceRoutes(HttpConfiguration config)
@@ -171,34 +174,60 @@
 
 
             routes.MapHttpRoute(RouteNames.Sources,
-                                this.repositoryPrefix + this.pathPrefix + "source/{id}/{version}/{*path}",
-                                new { controller = "SourceFiles" },
-                                new { version = new SemanticVersionConstraint() });
+                repositoryPrefix + PathPrefix + "source/{id}/{version}/{*path}",
+                new {controller = "SourceFiles"},
+                new {version = new SemanticVersionConstraint()});
 
 
             routes.MapHttpRoute(RouteNames.Symbols.Settings,
-                        this.repositoryPrefix + this.pathPrefix + "symbol-settings",
-                        new { controller = "Symbols", action = "GetSettings" });
+                repositoryPrefix + PathPrefix + "symbol-settings",
+                new {controller = "Symbols", action = "GetSettings"});
+
+            routes.MapHttpRoute(RouteNames.Symbols.Upload,
+                repositoryPrefix + PathPrefix + "symbols",
+                new {controller = "Symbols"},
+                new {httpMethod = new HttpMethodConstraint(HttpMethod.Put, HttpMethod.Options)});
 
 
             routes.MapHttpRoute(RouteNames.Symbols.GetFile,
-                        this.repositoryPrefix + this.pathPrefix + "symbols/{*path}",
-                        new { controller = "Symbols", action = "GetFile" });
+                repositoryPrefix + PathPrefix + "symbols/{*path}",
+                new {controller = "Symbols", action = "GetFile"});
         }
 
 
-        public void MapDataServiceRoutes(RouteCollection routes)
+        public void MapDataServiceRoutes(HttpConfiguration config)
         {
-            var dataServiceHostFactory = new RewriteBaseUrlNinjectDataServiceHostFactory();
+            var builder = new NuGetWebApiODataModelBuilder();
 
-            var serviceRoute = new DynamicServiceRoute(
-                this.ODataRoutePath,
-                RouteNames.PackageFeedRouteValues,
-                null,
-                dataServiceHostFactory,
-                typeof(PackageDataService));
+            builder.Build();
 
-            routes.Add(RouteNames.Packages.Feed, serviceRoute);
+            config.Formatters.InsertRange(0,
+                ODataMediaTypeFormatters.Create(
+                    new ODataPackageDefaultStreamAwareSerializerProvider(),
+                    new DefaultODataDeserializerProvider()));
+
+            var conventions = new List<IODataRoutingConvention>
+            {
+                new CompositeKeyRoutingConvention(),
+                new CompositeKeyPropertyRoutingConvention(),
+                new NonBindableActionRoutingConvention("PackagesOData"),
+                new EntitySetCountRoutingConvention(),
+                new NonBindableActionCountRoutingConvention("PackagesOData")
+            };
+
+            conventions.AddRange(ODataRoutingConventions.CreateDefault());
+
+            conventions = conventions
+                .Select(c => new ControllerAliasingODataRoutingConvention(c, "Packages", "PackagesOData"))
+                .Cast<IODataRoutingConvention>().ToList();
+
+            config.Routes.MapODataServiceRoute(
+                RouteNames.Packages.Feed,
+                ODataRoutePath,
+                builder.Model,
+                new CountODataPathHandler(),
+                conventions,
+                new HeaderCascadingODataBatchHandler(new NuGetWebApiRouteMapper.BatchHttpServer(config)));
         }
 
         #endregion

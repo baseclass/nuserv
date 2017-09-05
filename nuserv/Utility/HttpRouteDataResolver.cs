@@ -1,35 +1,35 @@
-﻿namespace nuserv.Utility
+﻿using System.Net.Http;
+using System.Web;
+using System.Web.Http;
+using System.Web.Http.Routing;
+
+namespace nuserv.Utility
 {
     #region Usings
-
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Web;
-    using System.Web.Http.Routing;
 
     #endregion
 
     public class HttpRouteDataResolver : IHttpRouteDataResolver
     {
+        private readonly HttpConfiguration config;
+
         #region Public Methods and Operators
+
+        public HttpRouteDataResolver(HttpConfiguration config)
+        {
+            this.config = config;
+        }
 
         public IHttpRouteData Resolve()
         {
             if (HttpContext.Current != null)
             {
-                if (HttpContext.Current.Items.Contains(""))
+                var request = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
+                if (request != null)
                 {
-                    var requestMessage = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
+                    var routeData = this.config.Routes.GetRouteData(request);
 
-                    if (requestMessage != null)
-                    {
-                        return requestMessage.GetRouteData();
-                    }
-                }
-                else
-                {
-                    return new RouteData(HttpContext.Current.Request.RequestContext.RouteData);
+                    return routeData;
                 }
             }
 
@@ -37,42 +37,5 @@
         }
 
         #endregion
-
-        private class RouteData : IHttpRouteData
-        {
-            #region Fields
-
-            private readonly System.Web.Routing.RouteData originalRouteData;
-
-            #endregion
-
-            #region Constructors and Destructors
-
-            public RouteData(System.Web.Routing.RouteData routeData)
-            {
-                if (routeData == null)
-                {
-                    throw new ArgumentNullException("routeData");
-                }
-                this.originalRouteData = routeData;
-                this.Route = null;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public IHttpRoute Route { get; private set; }
-
-            public IDictionary<string, object> Values
-            {
-                get
-                {
-                    return this.originalRouteData.Values;
-                }
-            }
-
-            #endregion
-        }
     }
 }
